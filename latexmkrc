@@ -11,7 +11,7 @@ $dvips = 'dvips %O -o %D %S';
 $ps2pdf = 'ps2pdf %O %S %D';
 
 # set build directory to ./build
-$out_dir = 'build';
+$out_dir = 'out';
 
 # delete temporary files
 $clean_full_ext = 'synctex.gz synctex.gz(busy) run.xml tex.bak bbl bcf fdb_latexmk fls log nav snm vrb';
