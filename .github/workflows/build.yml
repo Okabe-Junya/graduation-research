@@ -17,31 +17,31 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Create Cache Directory
-        run: mkdir -p ~/cache
+      # - name: Create Cache Directory
+      #   run: mkdir -p ~/cache
 
-      - name: Cache Directory
-        id: cache
-        uses: actions/cache/@v3
-        with:
-          path: ~/cache
-          key: cache-${{ runner.os }}
+      # - name: Cache Directory
+      #   id: cache
+      #   uses: actions/cache/@v3
+      #   with:
+      #     path: ~/cache
+      #     key: cache-${{ runner.os }}
 
-      - name: Pull Docker Image
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          docker pull paperist/texlive-ja:latest
-          docker save -o ~/cache/texlive.tar paperist/texlive-ja:latest
+      # - name: Pull Docker Image
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     docker pull paperist/texlive-ja:latest
+      #     docker save -o ~/cache/texlive.tar paperist/texlive-ja:latest
 
-      - name: Load Docker Image
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: docker load -i ~/cache/texlive.tar
+      # - name: Load Docker Image
+      #   if: steps.cache.outputs.cache-hit == 'true'
+      #   run: docker load -i ~/cache/texlive.tar
 
-      - name: Build LaTeX
-        run: make build
+      # - name: Build LaTeX
+      #   run: make build
 
-      - name: archive artifacts
-        run: mkdir -p build & tar -czvf ./build/out.tar ./out/sample.pdf sample.tex sample.bib
+      # - name: archive artifacts
+      #   run: mkdir -p build & tar -czvf ./build/out.tar ./out/sample.pdf sample.tex sample.bib
 
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
@@ -50,8 +50,5 @@ jobs:
           service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
 
       - name: upload to gcp
-        uses: 'google-github-actions/upload-cloud-storage@v1'
-        with:
-          path: './build/out.tar'
-          destination: 'graduation-thesis/'
+        run: gcloud storage ls gs://graduation-thesis
 
