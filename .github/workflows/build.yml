@@ -53,5 +53,5 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v1'
         with:
           path: './build/out.tar'
-          destination: 'graduation-thesis/out.tar'
+          destination: 'graduation-thesis/'
 
