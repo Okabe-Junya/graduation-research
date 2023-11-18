@@ -41,7 +41,7 @@ jobs:
         run: make build
 
       - name: archive artifacts
-        run: mkdir -p build & tar -czvf build/out.tar ./out/sample.pdf sample.tex sample.bib
+        run: mkdir -p build & tar -czvf ./build/out.tar ./out/sample.pdf sample.tex sample.bib
 
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
@@ -49,9 +49,9 @@ jobs:
           workload_identity_provider: 'projects/319991504102/locations/global/workloadIdentityPools/github-actions-pool/subject/attribute.repository/Okabe-Junya/graduation-research'
           service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
 
-      # - name: upload to gcp
-      #   uses: 'google-github-actions/upload-cloud-storage@v1'
-      #   with:
-      #     path: '/path/to/file'
-      #     destination: 'bucket-name/file'
+      - name: upload to gcp
+        uses: 'google-github-actions/upload-cloud-storage@v1'
+        with:
+          path: './build/out.tar'
+          destination: 'graduation-thesis/out.tar'
 
