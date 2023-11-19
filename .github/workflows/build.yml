@@ -1,4 +1,4 @@
-name: build and upload
+name: build and upload to Google cloud strage
 
 on:
   push:
@@ -8,6 +8,10 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -36,12 +40,15 @@ jobs:
       - name: Build LaTeX
         run: make build
 
-      - name: Upload PDF
-        uses: actions/upload-artifact@v3
+      - name: archive artifacts
+        run: mkdir -p build & tar -czvf ./build/out.tar ./out/sample.pdf sample.tex sample.bib
+
+      - name: auth gcp
+        uses: 'google-github-actions/auth@v1'
         with:
-          name: artifacts
-          path: |
-            ./build/sample.pdf
-            sample.tex
-            sample.bib
+          workload_identity_provider: 'projects/319991504102/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
+          service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
+
+      - name: Use gcloud CLI
+        run: 'gcloud storage cp ./build/out.tar gs://graduation-thesis'
 
