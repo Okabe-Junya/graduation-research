@@ -49,11 +49,6 @@ jobs:
           workload_identity_provider: 'projects/319991504102/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
           service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
 
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v1'
-        with:
-          version: '>= 363.0.0'
-
       - name: Use gcloud CLI
         run: 'gcloud storage ls gs://graduation-thesis'
 
