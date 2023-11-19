@@ -41,7 +41,11 @@ jobs:
         run: make build
 
       - name: archive artifacts
-        run: mkdir -p build & tar -czvf ./build/out.tar ./out/sample.pdf sample.tex sample.bib
+        run: |
+          mkdir -p artifacts
+          mv ./out/sample.pdf ./artifacts/sample.pdf
+          mv ./sample.tex ./artifacts/sample.tex
+          mv ./sample.bib ./artifacts/sample.bib
 
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
@@ -50,5 +54,5 @@ jobs:
           service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
 
       - name: Use gcloud CLI
-        run: 'gcloud storage cp ./build/out.tar gs://graduation-thesis'
+        run: 'gcloud storage cp -r ./artifacts gs://graduation-thesis'
 
