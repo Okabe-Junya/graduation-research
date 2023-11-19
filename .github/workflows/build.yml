@@ -43,9 +43,9 @@ jobs:
       - name: archive artifacts
         run: |
           mkdir -p artifacts
-          mv ./out/sample.pdf ./artifacts/sample.pdf
-          mv ./sample.tex ./artifacts/sample.tex
-          mv ./sample.bib ./artifacts/sample.bib
+          cp ./out/sample.pdf ./artifacts/sample.pdf
+          cp ./sample.tex ./artifacts/sample.tex
+          cp ./sample.bib ./artifacts/sample.bib
 
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
