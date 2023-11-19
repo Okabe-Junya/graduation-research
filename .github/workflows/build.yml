@@ -49,6 +49,11 @@ jobs:
           workload_identity_provider: 'projects/319991504102/locations/global/workloadIdentityPools/github-actions-pool/subject/attribute.repository/Okabe-Junya/graduation-research'
           service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
 
-      - name: upload to gcp
-        run: gcloud storage ls gs://graduation-thesis
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '1.1.1'
+
+      - name: Use gcloud CLI
+        run: 'gcloud info'
 
