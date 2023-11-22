@@ -18,11 +18,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Set up reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
       - name: Set up node
         uses: actions/setup-node@v4
         with:
