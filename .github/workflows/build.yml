@@ -45,7 +45,7 @@ jobs:
           mkdir -p artifacts
           cp ./out/report.pdf ./artifacts/report.pdf
           cp ./report.tex ./artifacts/report.tex
-          cp ./report.bib ./artifacts/report.bib
+          cp ./ref.bib ./artifacts/ref.bib
 
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
