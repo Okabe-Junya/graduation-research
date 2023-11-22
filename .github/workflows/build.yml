@@ -50,8 +50,8 @@ jobs:
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
         with:
-          workload_identity_provider: 'projects/319991504102/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
-          service_account: 'upload-cloud-storage-263@junya-project.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ secrets.POOLNAME }}/providers/${{ secrets.PROVIDER_NAME }}"
+          service_account: "${{ secrets.SERVICE_ACCOUNT_NAME }}@${{ secrets.PROJECT_NAME }}.iam.gserviceaccount.com"
 
       - name: Use gcloud CLI
         run: 'gcloud storage cp -r ./artifacts gs://graduation-thesis'
