@@ -9,9 +9,14 @@ jobs:
   reviewdog-check:
     name: reviewdog (check)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up reviewdog
         uses: reviewdog/action-setup@v1
@@ -20,6 +25,8 @@ jobs:
 
       - name: Set up node
         uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: install Dependencies
         run: npm ci
