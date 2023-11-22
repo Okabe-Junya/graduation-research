@@ -47,6 +47,9 @@ jobs:
           cp ./report.tex ./artifacts/report.tex
           cp ./ref.bib ./artifacts/ref.bib
 
+      - name: echo
+        run: echo "projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ secrets.POOLNAME }}/providers/${{ secrets.PROVIDER_NAME }}"
+
       - name: auth gcp
         uses: 'google-github-actions/auth@v1'
         with:
