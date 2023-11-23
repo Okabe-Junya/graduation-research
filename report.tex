@@ -130,6 +130,27 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 
 \subsection{代表的な輻輳制御アルゴリズム}
 
+ここでは、代表的な輻輳制御アルゴリズムについて概説する。
+輻輳制御アルゴリズムは、大きくLoss-basedとDelay-basedに分類される。
+これは輻輳制御アルゴリズムが、どのように輻輳を検知するかによって分類されており、Loss-basedはパケットロスを検知することで輻輳を検知する。
+一方で、Delay-basedは、パケットの遅延を検知することで輻輳を検知する。
+それぞれの代表的な輻輳制御アルゴリズムについて、\figref{figure:congestion_control_classification}に示す。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\linewidth]{fig/chap02/empty.png}
+  \caption{輻輳制御アルゴリズムの分類}
+  \label{figure:congestion_control_classification}
+\end{figure}
+
+Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\cite{reno,tcp}が挙げられる。
+これは、TCP Tahoe\cite{congestion-avoidance}を改良したもので、fast retransmitとfast recoveryという機構を追加したものである。
+\footnote{TODO: 補足する}
+
+一方で、Delay-basedの代表的な輻輳制御アルゴリズムとしては、TCP Vegas\cite{tcp-vegas}やBBR\cite{bbr}が挙げられる。
+
+より詳細な輻輳制御アルゴリズムの概説については、Lowら\cite{980245}, Ghaffari\cite{GHAFFARI2015101}などを参照されたい。
+
 \section{大規模言語モデルと進化アルゴリズム}
 
 \subsection{大規模言語モデル}
