@@ -14,6 +14,8 @@
 %%\usepackage[dvipdfmx,bookmarks=true,bookmarksnumbered=true,bookmarkstype=toc]{hyperref} \usepackage{pxjahyper}
 \usepackage{ulem}
 \usepackage{times} % use Times font instead of default one
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \setcounter{tocdepth}{3}
 \setcounter{page}{-1}
@@ -29,6 +31,7 @@
 \newcommand{\figref}[1]{図\ref{#1}}
 \newcommand{\tabref}[1]{表\ref{#1}}
 \newcommand{\secref}[1]{\ref{#1}節}
+\newcommand{\algorithmref}[1]{Algorithm \ref{#1}}
 
 %% タイトル生成用パッケージ（重要）
 \usepackage{coins}
@@ -128,6 +131,39 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することで、全体としてのスループットを最大化できることを示した。
 それゆえ、現在の輻輳制御アルゴリズムは、多くの場合、OSのカーネルに実装されており、自分自身のパケット送信量を制御のみを行う。
 
+極めて単純な輻輳制御アルゴリズムの動作を\algorithmref{algorithm:congestion_control_algorithm}に示す。
+\begin{algorithm}
+  \caption{Basic Congestion Control Algorithm}
+  \label{algorithm:congestion_control_algorithm}
+  \begin{algorithmic}[1]
+  \State $windowSize \gets 1$
+  \State $threshold \gets veryLargeNumber$
+  \While{true}
+      \If{ACK is received}
+        \If{$windowSize < threshold$}
+            \State $windowSize \gets windowSize + 1$
+        \Else
+            \State $windowSize \gets windowSize \times 2$
+        \EndIf
+      \EndIf
+      \If{Congestion is detected}
+          \State $threshold \gets windowSize / 2$
+          \State $windowSize \gets 1$
+      \EndIf
+  \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+\algorithmref{algorithm:congestion_control_algorithm}では、以下の2つの変数と、ACKの受信によってパケットの送信量を制御する。
+\begin{description}
+  \item[windowSize]
+  \item[] windowSizeは、一度に送信可能なパケットの数を表す。輻輳制御アルゴリズムは、このwindowSizeを制御することで、パケット送信量を制御する。
+  \item[threshold]
+  \item[] thresholdは、windowSizeを指数関数的に増加させる際の閾値を表す。thresholdを超えた場合には、windowSizeは加算によって増加させる。
+\end{description}
+つまり、\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合には、windowSizeを指数的あるいは線形に増加させることで、パケット送信量を増加させる。
+一方で、輻輳が発生した場合には、windowSizeを減少させることで、パケット送信量を減少させる。
+これが、輻輳制御アルゴリズムの基本的な動作である。
+
 \subsection{代表的な輻輳制御アルゴリズム}
 
 ここでは、代表的な輻輳制御アルゴリズムについて概説する。
@@ -146,6 +182,13 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\cite{reno,tcp}が挙げられる。
 これは、TCP Tahoe\cite{congestion-avoidance}を改良したもので、fast retransmitとfast recoveryという機構を追加したものである。
 \footnote{TODO: 補足する}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\linewidth]{fig/chap02/CongestionControlAlgorithm_Timeline.png}
+  \caption{TCP Renoの動作の概要}
+  \label{figure:reno-timeline}
+\end{figure}
 
 一方で、Delay-basedの代表的な輻輳制御アルゴリズムとしては、TCP Vegas\cite{tcp-vegas}やBBR\cite{bbr}が挙げられる。
 
