@@ -9,5 +9,5 @@ RUN apt-get update && \
 RUN tlmgr update --self && \
     tlmgr install \
     algorithms \
-    collection-mathscience \
+    algorithmicx \
     && rm -rf /tmp/texlive*
