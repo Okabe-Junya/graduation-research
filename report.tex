@@ -230,13 +230,22 @@ GAは、個体群の中から、適応度の高い個体を選択し、交叉や
 
 \subsection{進化アルゴリズムへの大規模言語モデルの応用}
 
-LMX: Meyersonら\cite{meyerson2023language}
+近年、大規模言語モデルを用いて、進化アルゴリズムの進化演算子を実現する研究が行われている。Meyersonら\cite{meyerson2023language}は、進化演算における交叉を大規模言語モデルを用いて実現できるのかを検証し、いくつかの分野の問題
+\footnote{数式生成のタスクや、画像処理、ソースコードの生成など}
+において、これがうまく機能することを示した。
+Lehmanら\cite{lehman2022evolution}は、大規模言語モデルを用いた変異によって、進化アルゴリズムがうまく機能するかを検証し、これを示した。
 
-ELM: Lehmanら\cite{lehman2022evolution}
+つまり単純なタスクであれば、進化アルゴリズムにおける交叉や変異を、大規模言語モデルを用いて実現できることが示されている。
+特に変異においては、大規模言語モデルを用いることで、従来の手法より探索空間が広がりやすく、より多様な解を探索できることが示されている。
 
 \subsection{進化アルゴリズムの輻輳制御アルゴリズムへの応用}
 
-Endoさんの論文: \cite{endo-2022-toward}
+進化アルゴリズムや強化学習を用いて、輻輳制御アルゴリズムの探索を行う研究がいくつか行われている。
+Endoら\cite{endo-2022-toward}は、遺伝的プログラミング\cite{holland1992adaptation, gp, gp-foundation}
+\footnote{厳密には、GE (Grammatical Evolution) \cite{grammatical-evolution}と呼ばれる、遺伝的プログラミングの一種を用いている。GE では、プログラムの文法をBNF (Backus-Naur Form) で表現し、定義された文法に従ってプログラムを生成する。}
+と品質多様性アルゴリズム\cite{quality-diversity}を用いることで、特定のネットワーク環境下での輻輳制御アルゴリズムの探索を行った。
+
+TODO: もう少し詳しく書く
 
 \newpage
 
