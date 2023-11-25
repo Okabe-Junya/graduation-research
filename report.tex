@@ -198,11 +198,18 @@ Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\c
 
 \subsection{大規模言語モデル}
 
-Attention: Vaswaniら\cite{attention}
+近年、大規模言語モデルの発展が著しい。
+然言語処理の分野における機械翻訳のタスクは、もともとはRNN\cite{graves2014generating}やLSTM\cite{6795963}などの時系列モデルを用いて行われていた。
+しかし、これらの手法では長期的な依存関係を捉えることが難しく、特に長い文章を高精度に翻訳することができなかった。
+2017年、Vaswaniら\cite{attention}の提案した、Transformerと呼ばれるモデルがこの問題を解決した。
+Transformerは、Attentionと呼ばれる機構を用いて、長期的な依存関係を捉えることができる。
+さらに、Transformerは、既存モデルと比べて並列化が容易であるため、学習にかかる時間を短縮できる。
 
-BERT: Devlinら\cite{devlin2019bert}
-
-GPT3: Brownら\cite{gpt3}
+さらに、Devlinら\cite{devlin2019bert}は、Transformerをベースとした、BERTと呼ばれる手法を提案した。
+Brownら\cite{gpt3}は、GPT3と呼ばれるモデルを提案した。
+これらのモデルは、大規模なコーパスを用いて学習されており、これらのモデルは、様々なタスクにおいて、既存のモデルを凌駕する性能を発揮した。
+現在では、特にgpt3の系統のモデルを中心に、これらは大規模言語モデルと呼ばれており、その性能は言うまでもないものなっている。
+また大規模言語モデルは、自然言語処理分野にとどまらず画像処理分野や音声処理分野などにも応用されている。
 
 \subsection{進化アルゴリズム}
 
