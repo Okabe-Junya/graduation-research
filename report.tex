@@ -131,7 +131,7 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することで、全体としてのスループットを最大化できることを示した。
 それゆえ、現在の輻輳制御アルゴリズムは、多くの場合、OSのカーネルに実装されており、自分自身のパケット送信量を制御のみを行う。
 
-極めて単純な輻輳制御アルゴリズムの動作を\algorithmref{algorithm:congestion_control_algorithm}に示す。
+単純な輻輳制御アルゴリズムの動作を\algorithmref{algorithm:congestion_control_algorithm}に示す。
 \begin{algorithm}
   \caption{Basic Congestion Control Algorithm}
   \label{algorithm:congestion_control_algorithm}
