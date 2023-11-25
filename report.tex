@@ -160,7 +160,7 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
   \item[threshold]
   \item[] thresholdは、windowSizeを指数関数的に増加させる際の閾値を表す。thresholdを超えた場合には、windowSizeは加算によって増加させる。
 \end{description}
-つまり、\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合には、windowSizeを指数的あるいは線形に増加させることで、パケット送信量を増加させる。
+つまり、\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合にはwindowSizeを指数的あるいは線形に増加させることでパケット送信量を増加させる。
 一方で、輻輳が発生した場合には、windowSizeを減少させることで、パケット送信量を減少させる。
 これが、輻輳制御アルゴリズムの基本的な動作である。
 
