@@ -16,6 +16,7 @@
 \usepackage{times} % use Times font instead of default one
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{amsmath}
 
 \setcounter{tocdepth}{3}
 \setcounter{page}{-1}
@@ -32,6 +33,7 @@
 \newcommand{\tabref}[1]{表\ref{#1}}
 \newcommand{\secref}[1]{\ref{#1}節}
 \newcommand{\algorithmref}[1]{Algorithm \ref{#1}}
+\newcommand{\equationref}[1]{式(\ref{#1})}
 
 %% タイトル生成用パッケージ（重要）
 \usepackage{coins}
@@ -123,13 +125,15 @@ TCP/IPネットワークでは、トランスポート層で輻輳制御が行�
 TCP/IPにおいて、トランスポート層では通信の信頼性を確保するために、パケットロスを検知すると、パケットが再送される。
 このため輻輳が発生すると、パケットロスが発生し、通信のスループットが低下する。
 \footnote{よりひどい状態になると、輻輳崩壊と呼ばれる状態になり、大規模な通信障害を引き起こすこともある。}
-このような状態を回避するために、輻輳制御という仕組みが存在する。
+このような状態を回避するため
+\footnote{Chiuら\cite{CHIU19891}は、単純な加算的増加、乗算的現象のアルゴリズムが、ネットワークの状態に関係なく効率的に輻輳回避に貢献することを検証した。}
+に、輻輳制御という仕組みが存在する。
 
 輻輳制御\cite{congestion-avoidance}は、観測可能な値からネットワークの状態を推定し、パケット送信量を制御することで、輻輳を回避する。
 \footnote{実際にJacobson\cite{congestion-avoidance}で提案された、世界初の輻輳制御アルゴリズムは、TCP Tahoeと名付けられた。}
 また、万が一輻輳が発生した場合には、輻輳制御アルゴリズムは輻輳が発生していることを検知しパケット送信量を制御する。
 興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することで、全体としてのスループットを最大化できることを示した。
-それゆえ、現在の輻輳制御アルゴリズムは、多くの場合、OSのカーネルに実装されており、自分自身のパケット送信量を制御のみを行う。
+それゆえ、現在の輻輳制御アルゴリズムは、OSのカーネルに実装されており自分自身のパケット送信量を制御のみを行う。
 
 単純な輻輳制御アルゴリズムの動作を\algorithmref{algorithm:congestion_control_algorithm}に示す。
 \begin{algorithm}
@@ -155,12 +159,10 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 \end{algorithm}
 \algorithmref{algorithm:congestion_control_algorithm}では、以下の2つの変数と、ACKの受信によってパケットの送信量を制御する。
 \begin{description}
-  \item[windowSize]
-  \item[] windowSizeは、一度に送信可能なパケットの数を表す。輻輳制御アルゴリズムは、このwindowSizeを制御することで、パケット送信量を制御する。
-  \item[threshold]
-  \item[] thresholdは、windowSizeを指数関数的に増加させる際の閾値を表す。thresholdを超えた場合には、windowSizeは加算によって増加させる。
+  \item[windowSize] windowSizeは、一度に送信可能なパケットの数を表す。輻輳制御アルゴリズムは、このwindowSizeを制御することで、パケット送信量を制御する。
+  \item[threshold] thresholdは、windowSizeを指数関数的に増加させる際の閾値を表す。thresholdを超えた場合には、windowSizeは加算によって増加させる。
 \end{description}
-つまり、\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合にはwindowSizeを指数的あるいは線形に増加させることでパケット送信量を増加させる。
+\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合にはwindowSizeを指数的あるいは線形に増加させることでパケット送信量を増加させる。
 一方で、輻輳が発生した場合には、windowSizeを減少させることで、パケット送信量を減少させる。
 これが、輻輳制御アルゴリズムの基本的な動作である。
 
@@ -171,18 +173,16 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 これは輻輳制御アルゴリズムが、どのように輻輳を検知するかによって分類されており、Loss-basedはパケットロスを検知することで輻輳を検知する。
 一方で、Delay-basedは、パケットの遅延を検知することで輻輳を検知する。
 それぞれの代表的な輻輳制御アルゴリズムについて、\figref{figure:congestion_control_classification}に示す。
-
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.6\linewidth]{fig/chap02/empty.png}
-  \caption{輻輳制御アルゴリズムの分類}
+  \caption{[wip] 輻輳制御アルゴリズムの分類}
   \label{figure:congestion_control_classification}
 \end{figure}
 
 Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\cite{reno,tcp}が挙げられる。
-これは、TCP Tahoe\cite{congestion-avoidance}を改良したもので、fast retransmitとfast recoveryという機構を追加したものである。
-\footnote{TODO: 補足する}
-
+これは、TCP Tahoe\cite{congestion-avoidance}を改良したもので、Fast RetransmitとFast Recoveryという機構を追加したものである。
+TCP Renoの動作の概要を\figref{figure:reno-timeline}に示す。
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.6\linewidth]{fig/chap02/CongestionControlAlgorithm_Timeline.png}
@@ -190,9 +190,49 @@ Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\c
   \label{figure:reno-timeline}
 \end{figure}
 
-一方で、Delay-basedの代表的な輻輳制御アルゴリズムとしては、TCP Vegas\cite{tcp-vegas}やBBR\cite{bbr}が挙げられる。
+TODO: \figref{figure:reno-timeline}の説明
 
-より詳細な輻輳制御アルゴリズムの概説については、Lowら\cite{980245}, Ghaffari\cite{GHAFFARI2015101}などを参照されたい。
+TCP Renoを更に改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている
+\footnote{特にTCP NewRenoでは、複数のパケットの損失時のwindowSizeの回復方法が改良されている。
+TCP Renoでは、Fast Recover中に他のパケットが損失した場合には、損失が検出されずACKが受信されるまでwindowSizeが回復しない。
+一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。}
+。
+
+一方で、Delay-basedの代表的な輻輳制御アルゴリズムとしては、TCP Vegas\cite{tcp-vegas}やBBR\cite{bbr}が挙げられる。
+Delay-basedの輻輳制御アルゴリズムは、パケットロスを検知するのではなくRTT: Round Trip Time によってネットワーク上の輻輳の程度を推定し、パケット送信量を制御する。
+
+TCP Vegasは、RTTの変化量を用いて輻輳を検出する。
+RTTの変化による検知は、一般的にはパケットロスによる検知よりも早いため、帯域幅の調整をより早く行うことができる
+\footnote{実際には、Delay-basedな輻輳制御アルゴリズムの輻輳の検知がLoss-basedよりも早いことで、パフォーマンス上の問題が発生することがある。
+例えばTCP Renoと、TCP Vegasが共存するネットワークにおいて、TCP VegasがRTTの変化によって素早く帯域幅を調整する一方で、TCP Renoはパケットロスが発生するまで、多くのパケットを送信し続ける。
+それゆえ、帯域幅の多くをTCP Renoが占有することになり、TCP Vegasのパフォーマンスが低下することがある。
+}
+。それゆえ、帯域幅を効率的に利用することができる。
+TCP Vegasのウインドウサイズの更新式を、\equationref{equation:tcp-vegas}に示す。
+ただし、$\alpha$と$\beta$は閾値を表す定数である。
+\begin{equation}
+  \label{equation:tcp-vegas}
+  cwnd_{now} =
+  \begin{cases}
+    cwnd + 1 & \text{if } diff < \alpha \\
+    cwnd - 1 & \text{if } diff > \beta \\
+    cwnd & \text{otherwise}
+  \end{cases}
+\end{equation}
+ここで、$diff$はRTTを元に推定される転送データの量であり、\equationref{equation:diff}に示すように計算される。
+\begin{equation}
+  \label{equation:diff}
+  diff = \left( \frac{cwnd}{RTT'} - \frac{cwnd}{RTT}\right) RTT'
+\end{equation}
+
+BBR: Bottleneck Bandwidth and Round-trip propagation time は、Googleによって開発された輻輳制御アルゴリズムであり、従来の輻輳制御アルゴリズムとは異なるアプローチを採用している。
+BBRでは、ボトルネックリンクの帯域幅
+\footnote{経路上で最も低い値をとる帯域幅のことを指す。}
+と往復時間遅延（RTproop: Round-trip propagation time）を推定し、これらの値を用いてパケット送信量を制御する。
+
+輻輳制御アルゴリズムの性能評価について、Fallら\cite{fall1996simulation}は、SACK: Selective Acknowledgement ~\cite{rfc2018}を用いたシミュレーションに基づく輻輳制御アルゴリズムの性能評価を行った。Moら\cite{752178}は、TCP Vegasの性能評価を、ネットワークの公平性の観点から行い、いくつかの改良点を提案した。
+
+より詳細な輻輳制御アルゴリズムの概説や近年の研究の動向については、Lowら\cite{980245}やGhaffari\cite{GHAFFARI2015101}などを参照されたい。
 
 \section{大規模言語モデルと進化アルゴリズム}
 
