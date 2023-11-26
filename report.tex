@@ -133,7 +133,7 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 多くの場合、輻輳制御によって輻輳の発生を抑えることができる
 \footnote{実際にJacobson\cite{congestion-avoidance}で提案された、世界初の輻輳制御アルゴリズムは、TCP Tahoeと名付けられた。}
 。万が一輻輳が発生した場合には、輻輳制御アルゴリズムは輻輳が発生していることを検知してパケット送信量を制御し、輻輳の影響を抑える。
-興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することで、ネットワーク全体としてのスループットを最大化できることを示した。
+興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することでネットワーク全体としてのスループットを最大化できることを示した。
 それゆえ現在の輻輳制御アルゴリズムは、OSのカーネルに実装されており、自分自身のパケット送信量を制御のみを行うことが多い。
 
 単純な輻輳制御アルゴリズムの動作を\algorithmref{algorithm:congestion_control_algorithm}に示す。
@@ -204,7 +204,7 @@ Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\c
 
 TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている。
 特に複数のパケットの損失時のwindowSizeの回復方法が改良されている。
-TCP Renoでは、Fast Recover中に他のパケットが損失した場合には、損失が検出されずACKが受信されるまでwindowSizeが回復しない。
+TCP RenoではFast Recover中に他のパケットが損失した場合、その損失は検出されず、ACKが受信されるまでwindowSizeが回復しない。
 一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。
 
 \subsubsection*{Delay-based 輻輳制御アルゴリズム}

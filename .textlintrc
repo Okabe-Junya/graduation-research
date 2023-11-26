@@ -10,7 +10,7 @@
       },
       "no-mix-dearu-desumasu": false,
       "max-kanji-continuous-len": false,
-      "sentence-length": 100
+      "sentence-length": false
     },
     "preset-ja-engineering-paper": {
       "unify-kuten-and-touten": false
