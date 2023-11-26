@@ -117,23 +117,24 @@ TCP/IPネットワークでは、トランスポート層で輻輳制御が行�
 \subsection{輻輳制御アルゴリズムの概要}
 
 % TODO: 表現の見直し
-パケット交換型の通信網である、TCP/IPネットワークでは、トランスポート層で輻輳制御が行われている。
-そもそも輻輳とは、コンピュータネットワークのあるノード
+パケット交換型の通信網であるTCP/IPネットワークでは、トランスポート層で輻輳制御が行われている。
+そもそも輻輳とは、ネットワーク上のあるノード
 \footnote{多くの場合、これは中継ルータのいずれかである。}
-上で、パケットが過剰に蓄積されることを指す。
+で、パケットが過剰に蓄積されパケットロスが発生、あるいはパケットの遅延が発生する状態のことを指す。
 一般的に、ルータ上ではパケットを蓄積するためのバッファが存在しており、これは FIFO: First In First Out 型のキューであるため、このバッファが溢れるとパケットのロスが発生する。
-TCP/IPにおいて、トランスポート層では通信の信頼性を確保するために、パケットロスを検知すると、パケットが再送される。
-このため輻輳が発生すると、パケットロスが発生し、通信のスループットが低下する。
+TCP/IPにおいて、トランスポート層では通信の信頼性を確保するために、パケットロスを検知するとパケットが再送される。
+このため輻輳が発生すると、パケットロスが発生し通信のスループットが低下する。
 \footnote{よりひどい状態になると、輻輳崩壊と呼ばれる状態になり、大規模な通信障害を引き起こすこともある。}
 このような状態を回避するため
-\footnote{Chiuら\cite{CHIU19891}は、単純な加算的増加、乗算的現象のアルゴリズムが、ネットワークの状態に関係なく効率的に輻輳回避に貢献することを検証した。}
+\footnote{Chiuら\cite{CHIU19891}は、単純な加算的増加、乗算的減少のアルゴリズムが、ネットワークの状態に関係なく効率的に輻輳回避に貢献することを検証した。}
 に、輻輳制御という仕組みが存在する。
 
-輻輳制御\cite{congestion-avoidance}は、観測可能な値からネットワークの状態を推定し、パケット送信量を制御することで、輻輳を回避する。
+輻輳制御\cite{congestion-avoidance}は、観測可能な値からネットワークの状態を推定し、一度に送信するパケットの量を制御する。
+多くの場合、輻輳制御によって輻輳の発生を抑えることができる
 \footnote{実際にJacobson\cite{congestion-avoidance}で提案された、世界初の輻輳制御アルゴリズムは、TCP Tahoeと名付けられた。}
-また、万が一輻輳が発生した場合には、輻輳制御アルゴリズムは輻輳が発生していることを検知しパケット送信量を制御する。
-興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することで、全体としてのスループットを最大化できることを示した。
-それゆえ、現在の輻輳制御アルゴリズムは、OSのカーネルに実装されており自分自身のパケット送信量を制御のみを行う。
+。万が一輻輳が発生した場合には、輻輳制御アルゴリズムは輻輳が発生していることを検知してパケット送信量を制御し、輻輳の影響を抑える。
+興味深いことに、Kellyら\cite{kelly1998rate}は、全体最適化やゲーム理論の観点から、各々のノードが自身のパケット送信量を制御することで、ネットワーク全体としてのスループットを最大化できることを示した。
+それゆえ現在の輻輳制御アルゴリズムは、OSのカーネルに実装されており、自分自身のパケット送信量を制御のみを行うことが多い。
 
 単純な輻輳制御アルゴリズムの動作を\algorithmref{algorithm:congestion_control_algorithm}に示す。
 \begin{algorithm}
@@ -157,21 +158,27 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
   \EndWhile
   \end{algorithmic}
 \end{algorithm}
-\algorithmref{algorithm:congestion_control_algorithm}では、以下の2つの変数と、ACKの受信によってパケットの送信量を制御する。
+\algorithmref{algorithm:congestion_control_algorithm}では、以下の2つの変数と、ACKの受信の契機によってパケットの送信量を調整する。
+
+% TODO: windowSize ではなく、cwnd と書く
+% TODO: threshold ではなく、ssthresh と書く
+
 \begin{description}
   \item[windowSize] windowSizeは、一度に送信可能なパケットの数を表す。輻輳制御アルゴリズムは、このwindowSizeを制御することで、パケット送信量を制御する。
   \item[threshold] thresholdは、windowSizeを指数関数的に増加させる際の閾値を表す。thresholdを超えた場合には、windowSizeは加算によって増加させる。
 \end{description}
 \algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合にはwindowSizeを指数的あるいは線形に増加させることでパケット送信量を増加させる。
-一方で、輻輳が発生した場合には、windowSizeを減少させることで、パケット送信量を減少させる。
+一方で輻輳が発生した場合には、windowSizeを減少させることで、パケット送信量を減少させる。
 これが、輻輳制御アルゴリズムの基本的な動作である。
 
 \subsection{代表的な輻輳制御アルゴリズム}
 
 ここでは、代表的な輻輳制御アルゴリズムについて概説する。
 輻輳制御アルゴリズムは、大きくLoss-basedとDelay-basedに分類される。
-これは輻輳制御アルゴリズムが、どのように輻輳を検知するかによって分類されており、Loss-basedはパケットロスを検知することで輻輳を検知する。
-一方で、Delay-basedは、パケットの遅延を検知することで輻輳を検知する。
+これは輻輳制御アルゴリズムがどのように輻輳を検知するかによって分類されており、Loss-basedはパケットロスを検知することで輻輳を検知する。
+一方で、Delay-basedは、RTT: Round Trip Time
+\footnote{パケットが送信元から受信元に送信され、さらにそのACKが送信元に返ってくるまでの合計時間のことを指す。}
+を用いることで輻輳を検知する。
 それぞれの代表的な輻輳制御アルゴリズムについて、\figref{figure:congestion_control_classification}に示す。
 \begin{figure}[htbp]
   \centering
@@ -179,32 +186,36 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
   \caption{[wip] 輻輳制御アルゴリズムの分類}
   \label{figure:congestion_control_classification}
 \end{figure}
+\figref{figure:congestion_control_classification} では、Loss-based 輻輳制御アルゴリズムをhoge色で、Delay-based 輻輳制御アルゴリズムをfuga色で示している。
+
+\subsubsection*{Loss-based 輻輳制御アルゴリズム}
 
 Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\cite{reno,tcp}が挙げられる。
 これは、TCP Tahoe\cite{congestion-avoidance}を改良したもので、Fast RetransmitとFast Recoveryという機構を追加したものである。
-TCP Renoの動作の概要を\figref{figure:reno-timeline}に示す。
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\linewidth]{fig/chap02/CongestionControlAlgorithm_Timeline.png}
-  \caption{TCP Renoの動作の概要}
-  \label{figure:reno-timeline}
-\end{figure}
+これらはTCP Tahoeの課題であった、輻輳発生後のwindowSizeの回復速度を改善するために追加された。
+% TCP Renoの動作の概要を\figref{figure:reno-timeline}に示す。
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.6\linewidth]{fig/chap02/CongestionControlAlgorithm_Timeline.png}
+%   \caption{TCP Renoの動作の概要}
+%   \label{figure:reno-timeline}
+% \end{figure}
+% TODO: \figref{figure:reno-timeline}の説明
 
-TODO: \figref{figure:reno-timeline}の説明
-
-TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている
-\footnote{特にTCP NewRenoでは、複数のパケットの損失時のwindowSizeの回復方法が改良されている。
+TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている。
+特に複数のパケットの損失時のwindowSizeの回復方法が改良されている。
 TCP Renoでは、Fast Recover中に他のパケットが損失した場合には、損失が検出されずACKが受信されるまでwindowSizeが回復しない。
-一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。}
-。
+一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。
+
+\subsubsection*{Delay-based 輻輳制御アルゴリズム}
 
 一方で、Delay-basedの代表的な輻輳制御アルゴリズムとしては、TCP Vegas\cite{tcp-vegas}やBBR\cite{bbr}が挙げられる。
-Delay-basedの輻輳制御アルゴリズムは、パケットロスを検知するのではなくRTT: Round Trip Time によってネットワーク上の輻輳の程度を推定し、パケット送信量を制御する。
+Delay-basedの輻輳制御アルゴリズムは、パケットロスを検知するのではなくRTTによってネットワーク上の輻輳の程度を推定し、パケット送信量を制御する。
 
 TCP Vegasは、RTTの変化量を用いて輻輳を検出する。
-RTTの変化による検知は、一般的にはパケットロスによる検知よりも早いため、帯域幅の調整をより早く行うことができる
+RTTの変化による輻輳の検知は、一般的にはパケットロスによる検知よりも早いため、windowSizeの調整をより早く行うことができる
 \footnote{実際には、Delay-basedな輻輳制御アルゴリズムの輻輳の検知がLoss-basedよりも早いことで、パフォーマンス上の問題が発生することがある。
-例えばTCP Renoと、TCP Vegasが共存するネットワークにおいて、TCP VegasがRTTの変化によって素早く帯域幅を調整する一方で、TCP Renoはパケットロスが発生するまで、多くのパケットを送信し続ける。
+例えばTCP Renoと、TCP Vegasが共存するネットワークにおいて、TCP VegasがRTTの変化によって素早くwindowSizeを調整する一方で、TCP Renoはパケットロスが発生するまで、多くのパケットを送信し続ける。
 それゆえ、帯域幅の多くをTCP Renoが占有することになり、TCP Vegasのパフォーマンスが低下することがある。
 }
 。それゆえ、帯域幅を効率的に利用することができる。
@@ -230,7 +241,9 @@ BBRでは、ボトルネックリンクの帯域幅
 \footnote{経路上で最も低い値をとる帯域幅のことを指す。}
 と往復時間遅延（RTproop: Round-trip propagation time）を推定し、これらの値を用いてパケット送信量を制御する。
 
-輻輳制御アルゴリズムの性能評価について、Fallら\cite{fall1996simulation}は、SACK: Selective Acknowledgement ~\cite{rfc2018}を用いたシミュレーションに基づく輻輳制御アルゴリズムの性能を評価した。Moら\cite{752178}は、TCP Vegasの性能評価を、ネットワークの公平性の観点から行い、いくつかの改良点を提案した。
+\subsubsection*{輻輳制御アルゴリズムの性能評価}
+
+輻輳制御アルゴリズムの性能評価について、Fallら\cite{fall1996simulation}は、SACK: Selective Acknowledgement ~\cite{rfc2018}を用いたシミュレーションに基づく輻輳制御アルゴリズムの性能を評価した。Moら\cite{752178}は、TCP Vegasの性能評価をネットワークの公平性の観点から行い、いくつかの改良点を提案した。
 
 より詳細な輻輳制御アルゴリズムの概説や近年の研究の動向については、Lowら\cite{980245}やGhaffari\cite{GHAFFARI2015101}などを参照されたい。
 
