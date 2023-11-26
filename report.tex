@@ -219,8 +219,10 @@ RTTの変化による輻輳の検知は、一般的にはパケットロスに�
 それゆえ、帯域幅の多くをTCP Renoが占有することになり、TCP Vegasのパフォーマンスが低下することがある。
 }
 。それゆえ、帯域幅を効率的に利用することができる。
-TCP Vegasのウインドウサイズの更新式を、\equationref{equation:tcp-vegas}に示す。
-ただし、$\alpha$と$\beta$は閾値を表す定数である。
+TCP Vegasのウインドウサイズの更新式を、\equationref{equation:tcp-vegas}に示す
+\footnote{論文によっては、更新幅を1ではなく、$1/cwnd$としていることがある。
+$1/cwnd$にすることで、$cwnd$が大きくなった際の更新幅を小さくし、輻輳の発生を抑制する効果がある。}。
+ただし、$\alpha$と$\beta$は閾値を表す定数で、$\alpha \leq \beta$である。
 \begin{equation}
   \label{equation:tcp-vegas}
   cwnd_{now} =
@@ -231,6 +233,7 @@ TCP Vegasのウインドウサイズの更新式を、\equationref{equation:tcp-
   \end{cases}
 \end{equation}
 ここで、$diff$はRTTを元に推定される転送データの量であり、\equationref{equation:diff}に示すように計算される。
+\equationref{equation:diff}の$RTT'$は、RTTの最小値を表す。
 \begin{equation}
   \label{equation:diff}
   diff = \left( \frac{cwnd}{RTT'} - \frac{cwnd}{RTT}\right) RTT'
@@ -240,9 +243,13 @@ BBR: Bottleneck Bandwidth and Round-trip propagation time は、Googleによっ�
 BBRでは、ボトルネックリンクの帯域幅
 \footnote{経路上で最も低い値をとる帯域幅のことを指す。}
 と往復時間遅延（RTproop: Round-trip propagation time）を推定し、これらの値を用いてパケット送信量を制御する。
+BBRは、他のBBRを用いるノードとの通信において、公平性を保ちながら高いスループットと低遅延を実現することができるためLinuxカーネル内でも実装されており、近年その採用が進んでいる。
+一方で、他の輻輳制御アルゴリズムとの共存した際に、BBRが帯域幅を占有する傾向があることが指摘されている。
 
 \subsubsection*{輻輳制御アルゴリズムの性能評価}
 
+輻輳制御アルゴリズムの性能評価に関して、ネットワーク環境や評価指標など様々な観点から研究が行われている。
+ネットワーク構造の変化や接続形態の変化、支配的な輻輳制御アルゴリズムの変化など多くの要因が輻輳制御アルゴリズムの性能に影響を与えるため、その評価は難しい。
 輻輳制御アルゴリズムの性能評価について、Fallら\cite{fall1996simulation}は、SACK: Selective Acknowledgement ~\cite{rfc2018}を用いたシミュレーションに基づく輻輳制御アルゴリズムの性能を評価した。Moら\cite{752178}は、TCP Vegasの性能評価をネットワークの公平性の観点から行い、いくつかの改良点を提案した。
 
 より詳細な輻輳制御アルゴリズムの概説や近年の研究の動向については、Lowら\cite{980245}やGhaffari\cite{GHAFFARI2015101}などを参照されたい。
@@ -296,9 +303,12 @@ Lehmanら\cite{lehman2022evolution}は、大規模言語モデルを用いた変
 進化アルゴリズムや強化学習を用いて、輻輳制御アルゴリズムを探索する研究がいくつか行われている。
 Endoら\cite{endo-2022-toward}は、遺伝的プログラミング\cite{holland1992adaptation, gp, gp-foundation}
 \footnote{厳密には、GE (Grammatical Evolution) \cite{grammatical-evolution}と呼ばれる、遺伝的プログラミングの一種を用いている。GE では、プログラムの文法をBNF (Backus-Naur Form) で表現し、定義された文法に従ってプログラムを生成する。}
-と品質多様性アルゴリズム\cite{quality-diversity}を用いることで、特定のネットワーク環境下での輻輳制御アルゴリズムの探索を行った。
+と品質多様性アルゴリズム\cite{quality-diversity}、共進化アルゴリズム\cite{poet, poet-gecco}を用いた輻輳制御アルゴリズムの探索を行った。
 
-TODO: もう少し詳しく書く
+Endoらの研究では、実行可能な輻輳制御アルゴリズムを探索することに成功していたものの、遺伝的プログラミングを用いていたため、探索空間が限定されていたという問題があった。
+Endoらの研究に限らず、遺伝的プログラミングや強化学習を用いた輻輳制御アルゴリズムの探索では、探索空間が限定されていることが多い。
+これは文法を予め定義していることや、交叉や変異がAST: Abstract Syntax Treeに対する操作に限定されていることが原因である。
+この問題に対する解決策を次章で検討する。
 
 \newpage
 
