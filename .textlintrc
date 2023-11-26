@@ -10,10 +10,10 @@
       },
       "no-mix-dearu-desumasu": false,
       "max-kanji-continuous-len": false,
-      "sentence-length": 100
+      "sentence-length": false
     },
     "preset-ja-engineering-paper": {
-        "unify-kuten-and-touten": false
+      "unify-kuten-and-touten": false
     },
     "preset-jtf-style": {
       "1.1.1.本文": false,
@@ -25,7 +25,10 @@
   "filters": {
     "comments": {
       "enablingComment": "textlint-enable",
-      "disablingComment": "textlint-disable"
+      "disablingComment": [
+        "textlint-disable",
+        "TODO: "
+      ]
     }
   }
 }
