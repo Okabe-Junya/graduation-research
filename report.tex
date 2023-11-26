@@ -192,7 +192,7 @@ TCP Renoの動作の概要を\figref{figure:reno-timeline}に示す。
 
 TODO: \figref{figure:reno-timeline}の説明
 
-TCP Renoを更に改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている
+TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている
 \footnote{特にTCP NewRenoでは、複数のパケットの損失時のwindowSizeの回復方法が改良されている。
 TCP Renoでは、Fast Recover中に他のパケットが損失した場合には、損失が検出されずACKが受信されるまでwindowSizeが回復しない。
 一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。}
@@ -230,7 +230,7 @@ BBRでは、ボトルネックリンクの帯域幅
 \footnote{経路上で最も低い値をとる帯域幅のことを指す。}
 と往復時間遅延（RTproop: Round-trip propagation time）を推定し、これらの値を用いてパケット送信量を制御する。
 
-輻輳制御アルゴリズムの性能評価について、Fallら\cite{fall1996simulation}は、SACK: Selective Acknowledgement ~\cite{rfc2018}を用いたシミュレーションに基づく輻輳制御アルゴリズムの性能評価を行った。Moら\cite{752178}は、TCP Vegasの性能評価を、ネットワークの公平性の観点から行い、いくつかの改良点を提案した。
+輻輳制御アルゴリズムの性能評価について、Fallら\cite{fall1996simulation}は、SACK: Selective Acknowledgement ~\cite{rfc2018}を用いたシミュレーションに基づく輻輳制御アルゴリズムの性能を評価した。Moら\cite{752178}は、TCP Vegasの性能評価を、ネットワークの公平性の観点から行い、いくつかの改良点を提案した。
 
 より詳細な輻輳制御アルゴリズムの概説や近年の研究の動向については、Lowら\cite{980245}やGhaffari\cite{GHAFFARI2015101}などを参照されたい。
 
