@@ -383,15 +383,18 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 
 \section{実験条件}
 % ref. https://github.com/Okabe-Junya/ns3-gym/blob/master/scratch/rl-tcp/sim.cc
-tcpEnvTimeStep = 0.01;
-bottleneck\_bandwidth = "2Mbps";
-bottleneck\_delay = "0.01ms";
-access\_bandwidth = "10Mbps";
-access\_delay = "20ms";
-mtu\_bytes = 400;
-duration = 10.0;
-flow\_monitor = false;
-sack = true;
+
+\begin{itemize}
+  \item tcpEnvTimeStep = 0.01
+  \item bottleneck\_bandwidth = "2Mbps"
+  \item bottleneck\_delay = "0.01ms"
+  \item access\_bandwidth = "10Mbps"
+  \item access\_delay = "20ms"
+  \item mtu\_bytes = 400
+  \item duration = 10.0
+  \item flow\_monitor = false
+  \item sack = true
+\end{itemize}
 
 
 \section{実験方法}
