@@ -348,6 +348,39 @@ Endoらの研究に限らず、遺伝的プログラミングや強化学習を�
 
 \section{実験環境}
 
+\subsection{ネットワークシミュレータ}
+
+本研究では、ネットワークシミュレータとして、ns3-gym\cite{ns3gym}を用いた。
+ns3-gymは、ns3\cite{ns3-2012, ns3-2010}を拡張したもので、OpenAI Gym\cite{gym}
+\footnote{現在はOpenAI Gymの開発は終了しており、Gymnasiumへの移行が進められている。}
+のインターフェースを提供する
+\footnote{つまり、ns3-gymでは輻輳制御アルゴリズムはPythonで表現され、これをns3のシミュレーションに組み込むことができる。
+後述するOpenAIのgptモデルのAPI用ライブラリはPythonとnode.jsでのみ提供されているため、Pythonで実装されたns3-gymを用いた。
+}。
+
+% TODO: なんか追記するか別途考える
+
+\subsection{大規模言語モデル}
+
+本研究では、大規模言語モデルとしてOpenAIが提供するGPT-4を用いた。
+GPT-4\cite{gpt4}は、2023年5月にリリースされたモデルで、多くのベンチマークでGPT-3よりも高い性能を発揮している。
+この実験を行っている2023年11月現在、OpenAIが提供するモデルの中では最も性能が高いため、本研究ではGPT-4を用いる。
+GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
+さらに、Pythonとnode.js用のAPI用ライブラリを公式に提供している。
+したがって、本研究ではPythonを用いてPythonスクリプトからGPT-4のAPIを呼び出すことで、大規模言語モデルを利用する。
+
+\subsection{実行環境}
+
+本研究の実験は、以下のマシン上で行った。
+また、Pythonのバージョンは3.11.6を用いた。
+
+\begin{description}
+  \item[CPU] Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+  \item[GPU] NVIDIA GeForce RTX 2080
+  \item[メモリ] 64GB
+  \item[OS] Ubuntu 22.04 LTS
+\end{description}
+
 \section{実験方法}
 
 \section{評価方法}
