@@ -323,6 +323,13 @@ Endoらの研究に限らず、遺伝的プログラミングや強化学習を�
   で最適な輻輳制御アルゴリズムを発見できるのではないか
 \end{enumerate}
 つまり、``大規模言語モデルを用いて交叉や変異を行う遺伝的アルゴリズムを用いて、輻輳制御アルゴリズムを探索する''という探索手法を提案する。
+提案手法の概要を\figref{figure:proposed_flow}に示す。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.4\linewidth]{fig/chap03/proposed_flow.png}
+  \caption{提案手法の概要}
+  \label{figure:proposed_flow}
+\end{figure}
 この提案手法は、既存の探索手法よりも、探索空間が広がり多様かつ優れた輻輳制御アルゴリズムを発見できるのではないか。
 
 ソースコードで表現されるアルゴリズムを進化計算によって探索する場合、遺伝的プログラミング（GP: Genetic Programming）が用いられることが多い。
