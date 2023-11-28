@@ -381,6 +381,19 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
   \item[OS] Ubuntu 22.04 LTS
 \end{description}
 
+\section{実験条件}
+% ref. https://github.com/Okabe-Junya/ns3-gym/blob/master/scratch/rl-tcp/sim.cc
+tcpEnvTimeStep = 0.01;
+bottleneck\_bandwidth = "2Mbps";
+bottleneck\_delay = "0.01ms";
+access\_bandwidth = "10Mbps";
+access\_delay = "20ms";
+mtu\_bytes = 400;
+duration = 10.0;
+flow\_monitor = false;
+sack = true;
+
+
 \section{実験方法}
 
 \section{評価方法}
