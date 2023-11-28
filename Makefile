@@ -1,9 +1,15 @@
 DEFAULT_GOAL := build
 
+
+.PHONY: docker-build
+docker-build:
+	@echo "Building docker image..."
+	@docker build -t tex-ja:latest .
+
 .PHONY: build
-build:
+build: docker-build
 	@echo "Building..."
-	@docker run --rm -v $$PWD:/workdir paperist/texlive-ja latexmk
+	@docker run --rm -v $$PWD:/workdir tex-ja:latest latexmk
 
 .PHONY: clean
 clean:
