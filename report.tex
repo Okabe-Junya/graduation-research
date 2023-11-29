@@ -17,6 +17,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{amsmath}
+\usepackage{url}
 
 \setcounter{tocdepth}{3}
 \setcounter{page}{-1}
@@ -350,7 +351,8 @@ Endoらの研究に限らず、遺伝的プログラミングや強化学習を�
 
 \subsection{ネットワークシミュレータ}
 
-本研究では、ネットワークシミュレータとして、ns3-gym\cite{ns3gym}を用いた。
+本研究ではネットワークシミュレータとして、ns3-gym\cite{ns3gym}を用いた
+\footnote{厳密に言えばns3-gymは、OpenAI Gymとns3のインタフェースを提供するフレームワークである。しかしここでは簡単のため、単にネットワークシミュレータと呼ぶ。}。
 ns3-gymは、ns3\cite{ns3-2012, ns3-2010}を拡張したもので、OpenAI Gym\cite{gym}
 \footnote{現在はOpenAI Gymの開発は終了しており、Gymnasiumへの移行が進められている。}
 のインターフェースを提供する
@@ -358,7 +360,20 @@ ns3-gymは、ns3\cite{ns3-2012, ns3-2010}を拡張したもので、OpenAI Gym\c
 後述するOpenAIのgptモデルのAPI用ライブラリはPythonとnode.jsでのみ提供されているため、Pythonで実装されたns3-gymを用いた。
 }。
 
-% TODO: なんか追記するか別途考える
+そもそもns3とは、C++で実装されたネットワークシミュレータである。ns3では、利用者が自由にネットワーク環境、プロトコルやアルゴリズムを設定し、ネットワークシミュレーションを行うことができる。
+さらに、シミュレーション中にネットワークの状態を計測することができる。
+しかし、ns3では利用者が環境やプロトコルなどの大部分を設定、実装する必要がありこれらの設定や実装には多くの時間と知識が必要となる。
+先述した通り、ns3-gymはns3を拡張したものであるため、同様にネットワークシミュレーションを行うことができ、更にシミュレーションのためのいくつかの一般的なネットワーク環境が提供されている。
+本実験では、この提供されている環境をベースに、輻輳制御アルゴリズムの探索実験を行った。実験に使用するネットワークトポロジーを\figref{figure:network-topology}に示す。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\linewidth]{fig/chap04/network-topology.png}
+  \caption{ns3-gymで提供されるネットワークトポロジー}
+  \label{figure:network-topology}
+\end{figure}
+\figref{figure:network-topology}は、いわゆるダンベル型のネットワークトポロジーと呼ばれるトポロジーである。
+ダンベル型トポロジーでは、トラフィックはclientからsinksへボトルネックリンクを介して流れる。
+\secref{section:evaluation-method}で詳しく説明するが、本実験ではこのRouter1のスループットを計測することで、輻輳制御アルゴリズムの性能を評価する。
 
 \subsection{大規模言語モデル}
 
@@ -384,22 +399,53 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 \section{実験条件}
 % ref. https://github.com/Okabe-Junya/ns3-gym/blob/master/scratch/rl-tcp/sim.cc
 
-\begin{itemize}
-  \item tcpEnvTimeStep = 0.01
-  \item bottleneck\_bandwidth = "2Mbps"
-  \item bottleneck\_delay = "0.01ms"
-  \item access\_bandwidth = "10Mbps"
-  \item access\_delay = "20ms"
-  \item mtu\_bytes = 400
-  \item duration = 10.0
-  \item flow\_monitor = false
-  \item sack = true
-\end{itemize}
+この節では特にネットワークシミュレータの設定について述べ、実験を行う条件を明らかにする。
+本実験では、ネットワークシミュレータns3-gymのパラメータを\tabref{tab:network_simulator_parameters}に示すように設定した
+\footnote{これらの設定は\url{https://github.com/Okabe-Junya/ns3-gym/blob/master/scratch/rl-tcp/sim.cc#L96-L111}で定義されている。ソースコードの該当箇所を直接書き換えるか、コマンドライン引数で上書きすることで設定を変更できる。}。
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{|l|l|}
+  \hline
+  \textbf{Parameter} & \textbf{Value} \\ \hline
+  tcpEnvTimeStep & 0.01 \\ \hline
+  nLeaf & 1 \\ \hline
+  transport\_prot & TcpRl \\ \hline
+  error\_p & 0.0 \\ \hline
+  bottleneck\_bandwidth & 2Mbps \\ \hline
+  bottleneck\_delay & 0.01ms \\ \hline
+  access\_bandwidth & 10Mbps \\ \hline
+  access\_delay & 20ms \\ \hline
+  data\_mbytes & 0 \\ \hline
+  mtu\_bytes & 400 \\ \hline
+  duration & 10.0 \\ \hline
+  flow\_monitor & false \\ \hline
+  sack & true \\ \hline
+  \end{tabular}
+  \caption{ネットワークシミュレータの設定パラメータ}
+  \label{tab:network_simulator_parameters}
+\end{table}
+
+\tabref{tab:network_simulator_parameters}の各項目について簡潔に説明する。
+\begin{description}
+  \item[tcpEnvTimeStep] ネットワークシミュレータにおける、TCP関連のイベントを発生させる間隔を表す。この値の間隔でウインドウサイズの更新やパケットの送信、再送信などが行われる。
+  \item[nLeaf] ネットワークシミュレータにおける、TCPのノード数を表す。
+  \item[transport\_prot] トランスポート層で使用するプロトコルを表す\footnote{本実験で設定したTcpRlは、ns3-gymで提供されているトランスポート層のプロトコルの一つである。TCPを拡張し、強化学習が行えるように設計されているが、本実験の中ではTCPとは同様の挙動を示す。}。
+  \item[error\_p] ネットワークでデータ転送中エラーが発生する確率を表す。
+  \item[bottleneck\_bandwidth] ボトルネックリンクの帯域幅を表す。
+  \item[bottleneck\_delay] ボトルネックリンクの遅延を表す。
+  \item[access\_bandwidth] アクセスリンクの帯域幅を表す。ただしアクセスリンクとは、エンドユーザがネットワークに接続する際に使用するリンクのことである。
+  \item[access\_delay] アクセスリンクの遅延を表す。
+  \item[mtu\_bytes] 最大転送速度（MTU: Maximum Transmission Unit）のバイト数を表す。これは一度に送信できるパケットの最大サイズを表す。
+  \item[duration] シミュレーションの実行時間を表す。
+  \item[flow\_monitor] フローモニタを有効にするかどうかを表す。フローモニタとは、ネットワークシミュレータにおいて、データフローを追跡するためのモジュールである。
+  \item[sack] SACK: Selective Acknowledgement を有効にするかどうかを表す。一般的にはこれを有効にすることで、TCPの性能が向上する。
+\end{description}
 
 
 \section{実験方法}
 
 \section{評価方法}
+\label{section:evaluation-method}
 
 \newpage
 
