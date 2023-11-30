@@ -364,7 +364,7 @@ ns3-gymは、ns3\cite{ns3-2012, ns3-2010}を拡張したもので、OpenAI Gym\c
 ns3では、利用者が自由にネットワーク環境、プロトコルやアルゴリズムを設定し、ネットワークシミュレーションができる。
 さらに、シミュレーション中にネットワークの状態を計測できる。
 しかし、ns3では利用者が環境やプロトコルなどの大部分を設定、実装する必要がありこれらの設定や実装には多くの時間と知識が必要となる。
-先述した通り、ns3-gymはns3を拡張したものであるため、同様にネットワークシミュレーションを行うことができ、更にシミュレーションのためのいくつかの一般的なネットワーク環境が提供されている。
+先述したとおり、ns3-gymはns3を拡張したものであるため、同様にネットワークシミュレーションを行うことができ、さらにシミュレーションのためのいくつかの一般的なネットワーク環境が提供されている。
 本実験では、この提供されている環境をベースに、輻輳制御アルゴリズムの探索実験を行った。実験に使用するネットワークトポロジーを\figref{figure:network-topology}に示す。
 \begin{figure}[htbp]
   \centering
@@ -400,7 +400,7 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 \section{実験条件}
 % ref. https://github.com/Okabe-Junya/ns3-gym/blob/master/scratch/rl-tcp/sim.cc
 
-この節では特にネットワークシミュレータの設定について述べ、実験を行う条件を明らかにする。
+この節では特にネットワークシミュレータの設定について述べ、実験の条件を明らかにする。
 本実験では、ネットワークシミュレータns3-gymのパラメータを\tabref{tab:network_simulator_parameters}に示すように設定した
 \footnote{これらの設定は\url{https://github.com/Okabe-Junya/ns3-gym/blob/master/scratch/rl-tcp/sim.cc#L96-L111}で定義されている。ソースコードの該当箇所を直接書き換えるか、コマンドライン引数で上書きすることで設定を変更できる。}。
 \begin{table}[ht]
@@ -434,7 +434,7 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
   \item[error\_p] ネットワークでデータ転送中エラーが発生する確率を表す。
   \item[bottleneck\_bandwidth] ボトルネックリンクの帯域幅を表す。
   \item[bottleneck\_delay] ボトルネックリンクの遅延を表す。
-  \item[access\_bandwidth] アクセスリンクの帯域幅を表す。ただしアクセスリンクとは、エンドユーザがネットワークに接続する際に使用するリンクのことである。
+  \item[access\_bandwidth] アクセスリンクの帯域幅を表す。ただしアクセスリンクとは、エンドユーザがネットワークへ接続する際に使用するリンクのことである。
   \item[access\_delay] アクセスリンクの遅延を表す。
   \item[mtu\_bytes] 最大転送速度（MTU: Maximum Transmission Unit）のバイト数を表す。これは一度に送信できるパケットの最大サイズを表す。
   \item[duration] シミュレーションの実行時間を表す。
