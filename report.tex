@@ -32,6 +32,7 @@
 
 \newcommand{\figref}[1]{図\ref{#1}}
 \newcommand{\tabref}[1]{表\ref{#1}}
+\newcommand{\chapref}[1]{第\ref{#1}章}
 \newcommand{\secref}[1]{\ref{#1}節}
 \newcommand{\algorithmref}[1]{Algorithm \ref{#1}}
 \newcommand{\equationref}[1]{式(\ref{#1})}
@@ -314,7 +315,7 @@ Endoらの研究に限らず、遺伝的プログラミングや強化学習を�
 \newpage
 
 \chapter{仮説}
-
+\label{chapter:hypothesis}
 関連研究をもとに、以下の仮説を立てた。
 \begin{enumerate}
   \item 大規模言語モデルを用いた輻輳制御アルゴリズムの探索手法は、既存の探索手法と比べて、探索空間が広がるのではないか
@@ -446,9 +447,66 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 
 
 \section{実験方法}
+\label{section:experiment-method}
+この節では実験の方法について述べる。
+方針は、\chapref{chapter:hypothesis}の\figref{figure:proposed_flow}で示したように、輻輳制御アルゴリズムを個体として、遺伝的アルゴリズムによって探索することである。
+このとき、遺伝的アルゴリズムの交叉や変異は、大規模言語モデルを用いて実現する。
+評価関数については、\secref{section:evaluation-method}で改めて述べる。
+実験で実装する遺伝的アルゴリズムの擬似コードを\algorithmref{algorithm:genetic-algorithm}に示す。
+% TODO: \figref{figure:proposed_flow}の図を修正する
+\begin{algorithm}[htbp]
+  \caption{Pseudocode of Genetic Algorithm}
+  \label{algorithm:genetic-algorithm}
+  \begin{algorithmic}[1]
+    \Require
+      \Statex $N$: Population size
+      \Statex $G$: Number of generations
+      \Statex $P$: Crossover probability
+      \Statex $M$: Mutation probability
+      % \Statex $L$: Length of chromosome
+      \Statex $f$: Evaluation function
+    \Ensure
+      \Statex $best$: Best individual in population
+
+    \State $population \gets$ Initialize population
+    \For{$g \gets 1$ to $G$}
+      \State $population \gets$ Evaluate population using $f$
+      \State $best \gets$ Best individual in $population$
+      \State $nextPopulation \gets$ $\phi$
+      \State $p1$ $\gets$ select $population$
+      \State $p2$ $\gets$ select $population$
+      \For {$i \gets 1$ to $N$}
+        If {random() $<$ 0.5}
+          c $\gets$ $p1[i]$
+        Else
+          c $\gets$ $p2[i]$
+        EndIf
+        \If {random() $<$ $P$}
+          c $\gets$ crossover($p1[i]$, $p2[i]$)
+        \EndIf
+        \If {random() $<$ $M$}
+          c $\gets$ mutate(c)
+        \EndIf
+        \State $nextPopulation \gets nextPopulation \cup \{c\}$
+      \EndFor
+      \State $population \gets nextPopulation$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+本実験では、\algorithmref{algorithm:genetic-algorithm}に示した疑似コードを実際にPythonで実装し、実験を行った。
 
 \section{評価方法}
 \label{section:evaluation-method}
+
+遺伝的アルゴリズムの評価関数として、\figref{figure:network-topology}のRouter1で計測されるスループットを用いた。
+\secref{section:evaluation-method}で述べたとおり、遺伝的アルゴリズムの各個体は輻輳制御アルゴリズムを表すPythonスクリプトであるため、これをネットワークシミュレータに組み込んで実行することで、その性能を評価することができる。
+0.01秒ごとにRouter1で計測されたスループットを取得し、その平均値を評価関数とした。
+時刻$t$におけるスループットを$T(t)$とすると、評価関数$f$は\equationref{equation:evaluation-function}のように表される。
+\begin{equation}
+  \label{equation:evaluation-function}
+  f = \frac{1}{N} \sum_{t=0}^{N} T(t)
+\end{equation}
+ただし\equationref{equation:evaluation-function}で、$N$はスループットの計測回数を表す。
 
 \newpage
 
