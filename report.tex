@@ -373,7 +373,9 @@ ns3では、利用者が自由にネットワーク環境、プロトコルや�
   \label{figure:network-topology}
 \end{figure}
 \figref{figure:network-topology}は、いわゆるダンベル型のネットワークトポロジーと呼ばれるトポロジーである。
-ダンベル型トポロジーでは、トラフィックはclientからsinksへボトルネックリンクを介して流れる。
+ダンベル型トポロジーでは、トラフィックはclientからsinks
+\footnote{sinksは、ネットワーク上でのデータフローの終点を表す。}
+へボトルネックリンクを介して流れる。
 \secref{section:evaluation-method}で詳しく説明するが、本実験ではこのRouter1のスループットを計測することで、輻輳制御アルゴリズムの性能を評価する。
 
 \subsection{大規模言語モデル}
@@ -429,7 +431,7 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 \tabref{tab:network_simulator_parameters}の各項目について簡潔に説明する。
 \begin{description}
   \item[tcpEnvTimeStep] ネットワークシミュレータにおける、TCP関連のイベントを発生させる間隔を表す。この値の間隔でウインドウサイズの更新やパケットの送信、再送信などが行われる。
-  \item[nLeaf] ネットワークシミュレータにおける、TCPのノード数を表す。
+  \item[nLeaf] ネットワークシミュレータにおける、TCPのリーフノード数を表す。厳密には、Routerの左右それぞれにnLeaf個のノードが接続される。今回はnLeaf=1であるため、\figref{figure:network-topology}のように、Routerの左右それぞれに1つのノードが接続される。
   \item[transport\_prot] トランスポート層で使用するプロトコルを表す\footnote{本実験で設定したTcpRlは、ns3-gymで提供されているトランスポート層のプロトコルの一つである。TCPを拡張し、強化学習が行えるように設計されているが、本実験の中ではTCPとは同様の挙動を示す。}。
   \item[error\_p] ネットワークでデータ転送中エラーが発生する確率を表す。
   \item[bottleneck\_bandwidth] ボトルネックリンクの帯域幅を表す。
