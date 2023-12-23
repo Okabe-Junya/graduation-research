@@ -7,6 +7,7 @@
 %%
 \documentclass[a4paper,11pt]{jreport}
 
+\usepackage{xcolor}
 %%【PDF, PostScript, JPEG, PNG等の画像の貼り込み】
 %% dvipdfmx を使う場合
 \usepackage[dvipdfmx]{graphicx}
@@ -18,6 +19,20 @@
 \usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{url}
+\usepackage{listings}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  commentstyle=\color{green},
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  frame=tb
+}
 
 \setcounter{tocdepth}{3}
 \setcounter{page}{-1}
@@ -209,6 +224,9 @@ TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012n
 TCP RenoではFast Recover中に他のパケットが損失した場合、その損失は検出されず、ACKが受信されるまでwindowSizeが回復しない。
 一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。
 
+% TODO: CUBICを加える。
+\cite{cubic}
+
 \subsubsection*{Delay-based 輻輳制御アルゴリズム}
 
 一方で、Delay-basedの代表的な輻輳制御アルゴリズムとしては、TCP Vegas\cite{tcp-vegas}やBBR\cite{bbr}が挙げられる。
@@ -345,7 +363,7 @@ Endoらの研究に限らず、遺伝的プログラミングや強化学習を�
 \newpage
 
 \chapter{実験}
-
+\label{chapter:experiment}
 この章では、実験の環境や実験方法、実装の詳細やその評価方法について述べる。
 
 \section{実験環境}
@@ -507,6 +525,122 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
   f = \frac{1}{N} \sum_{t=0}^{N} T(t)
 \end{equation}
 ただし\equationref{equation:evaluation-function}で、$N$はスループットの計測回数を表す。
+
+\newpage
+
+\chapter{結果}
+
+\label{chapter:result}
+\chapref{chapter:experiment}で説明した実験を行った。その実験結果を示す。
+\section{実験結果}
+\figref{figure:generation_throughput}に、遺伝的アルゴリズムの世代ごとの評価値
+\footnote{評価値は、\secref{section:evaluation-method}で述べた評価関数$f$の値である。}
+の平均、最大値の推移を示す。
+\begin{figure}[htbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=1.0\linewidth]{fig/chap05/generation_throughput.png}
+  \caption{世代ごとのスループットの推移。横軸は世代数、縦軸はスループットを表す。GAの交叉や変異によって実行不可能なアルゴリズムが生成された場合、その評価値は0となる。その影響を減らすために、評価値の上位50\%の個体のみを用いて再度平均を計算した。}
+  \label{figure:generation_throughput}
+\end{figure}
+\figref{figure:generation_throughput}から、世代が進むにつれて、評価値の平均が緩やかな増加を示していることが読み取れる。
+その一方、個体の評価値の最大値については、世代を追っても増加傾向は見られない。
+
+\begin{lstlisting}[caption=最もスループットが高かった個体のソースコード,label=lst:best_individual]
+from tcp_base import TcpEventBased
+
+class TcpEventBase(TcpEventBased):
+    def __init__(self):
+        super(TcpEventBased, self).__init__()
+
+    def get_action(self, obs, reward, done, info):
+        # unique socket ID
+        socketUuid = obs[0]
+        # TCP env type: event-based = 0 / time-based = 1
+        envType = obs[1]
+        # sim time in us
+        simTime_us = obs[2]
+        # unique node ID
+        nodeId = obs[3]
+        # current ssThreshold
+        ssThresh = obs[4]
+        # current contention window size
+        cWnd = obs[5]
+        # segment size
+        segmentSize = obs[6]
+        # number of acked segments
+        segmentsAcked = obs[7]
+        # estimated bytes in flight
+        bytesInFlight = obs[8]
+
+        # Mutate the congestion window and ssThreshold calculation
+        if reward > 0 and segmentsAcked > 0:
+            # Aim for cubic growth until ssThresh and linear afterwards
+            new_cWnd = (
+                (cWnd**3 + segmentSize) ** (1 / 3)
+                if cWnd < ssThresh
+                else cWnd + (segmentSize * segmentsAcked)
+            )
+            new_ssThresh = max(ssThresh, int(bytesInFlight * 0.8))
+        else:
+            # Quick recovery using a square root
+            new_cWnd = int(bytesInFlight**0.5)
+            new_ssThresh = max(new_cWnd, ssThresh // 2)
+
+        # return actions
+        actions = [int(new_ssThresh), int(new_cWnd)]
+
+        return actions
+\end{lstlisting}
+
+\newpage
+
+\chapter{考察}
+\label{chapter:discussion}
+この章では、\chapref{chapter:result}で示した結果について考察する。
+特に、Listings \ref{lst:best_individual}に示した評価値の良い個体について、著名な輻輳制御アルゴリズムと比較しながら議論を行う。また、\chapref{chapter:hypothesis}で立てた仮説の検証という観点から、本研究の貢献について述べる。
+
+\section{評価値の良い個体に関する考察}
+議論の簡単のため、Listings \ref{lst:best_individual}に示した個体の疑似コードを\algorithmref{algorithm:highest-throughput-individual}に示す。
+\begin{algorithm}
+  \caption{Highest Throughput Individual Pseudocode}
+  \label{algorithm:highest-throughput-individual}
+  \begin{algorithmic}[1]
+
+  \Procedure{get\_action}{$obs, reward, done, info$}
+      \State Extract $ssThresh, cWnd, segmentSize, segmentsAcked, bytesInFlight$ from $obs$
+
+      \If{$reward > 0$ \textbf{and} $segmentsAcked > 0$}
+          \If{$cWnd < ssThresh$}
+              \State $new\_cWnd \gets (cWnd^3 + segmentSize)^{\frac{1}{3}}$
+          \Else
+              \State $new\_cWnd \gets cWnd + (segmentSize \times segmentsAcked)$
+          \EndIf
+          \State $new\_ssThresh \gets \max(ssThresh, \lfloor bytesInFlight \times 0.8 \rfloor)$
+      \Else
+          \State $new\_cWnd \gets \lfloor \sqrt{bytesInFlight} \rfloor$
+          \State $new\_ssThresh \gets \max(new\_cWnd, \lfloor ssThresh / 2 \rfloor)$
+      \EndIf
+
+      \State \textbf{return} $[new\_ssThresh, new\_cWnd]$
+  \EndProcedure
+
+  \end{algorithmic}
+\end{algorithm}
+\algorithmref{algorithm:highest-throughput-individual}を観察すると、現在広く普及している輻輳制御アルゴリズムの一つであるCUBIC\cite{cubic}やTCP NewReno\cite{floyd2004newreno,henderson2012newreno}の要素を部分的に取り入れつつも、ユニークなアルゴリズムを実現していると考えられる
+\footnote{これはあくまでも、\algorithmref{algorithm:highest-throughput-individual}が著名な輻輳制御アルゴリズムの要素を部分的には取り入れつつも、}。
+具体的には、Listings \ref{lst:best_individual}のL.5では、CUBICのように、cwndの増加を立方関数で表現している
+\footnote{厳密にはこの三乗根を取っているため、CUBICと同様の挙動を示すわけではない}。
+また、L.7では、TCP NewRenoのようにcwndの増加を線形関数で表現している。
+
+\section{仮説の検証}
+
+\chapref{chapter:hypothesis}で立てた仮説は、以下の3つである。
+\begin{enumerate}
+  \item 大規模言語モデルを用いた輻輳制御アルゴリズムの探索手法は、既存の探索手法と比べて、探索空間が広がるのではないか
+  \item 進化アルゴリズム、特に遺伝的アルゴリズムを用いることで、既存の探索手法よりも多様かつ優れた輻輳制御アルゴリズムを発見できるのではないか
+  \item 1, 2で提案した探索手法であれば、任意のネットワーク環境下で最適な輻輳制御アルゴリズムを発見できるのではないか
+\end{enumerate}
 
 \newpage
 
