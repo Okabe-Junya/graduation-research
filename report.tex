@@ -551,7 +551,46 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 \figref{figure:generation_throughput}から、世代が進むにつれて、評価値の平均が緩やかな増加を示していることが読み取れる。
 その一方、個体の評価値の最大値については、世代を追っても増加傾向は見られない。
 
-% TODO: 評価値の分布を載せる
+\begin{figure}[htbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=1.0\linewidth]{fig/chap05/generation_throughput_exclude_zero.png}
+  \caption{実行不可能な個体を除いた世代ごとのスループットの平均の推移}
+  \label{figure:generation_result_exclude_zero}
+\end{figure}
+
+\begin{figure}[htbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=1.0\linewidth]{fig/chap05/generation_result.png}
+  \caption{世代ごとのssthresh, cwndの平均の推移}
+  \label{figure:generation_result}
+\end{figure}
+
+\begin{figure}[htbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=1.0\linewidth]{fig/chap05/boxplot_throughput.png}
+  \caption{1, 10, 50, 100世代のスループットの箱ひげ図}
+  \label{figure:boxplot_throughput}
+\end{figure}
+
+\begin{figure}[htbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=1.0\linewidth]{fig/chap05/boxplot.png}
+  \caption{1, 10, 50, 100世代のssthresh, cwndの箱ひげ図}
+  \label{figure:boxplot}
+\end{figure}
+
+\begin{figure}[htbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=1.0\linewidth]{fig/chap05/invalid_results.png}
+  \caption{実行不可能な個体数の推移}
+  \label{figure:invalid_results}
+\end{figure}
+
 
 また、すべての世代の中でもっとも高い評価値は、1668.45であった。
 本研究ではベンチマークとして、NewRenoを用いており、NewRenoの評価値は1523.26であった。
