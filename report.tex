@@ -553,10 +553,11 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 
 % TODO: 評価値の分布を載せる
 
-また、すべての世代の中で最も高い評価値は、1668.45であった。
-本研究ではベンチマークとして、NewRenoを用いており、NewRenoの評価値は1523.26であったため、本実験の環境下においては、最も高い評価値を示した個体はNewRenoよりも性能が高いと言える。
+また、すべての世代の中でもっとも高い評価値は、1668.45であった。
+本研究ではベンチマークとして、NewRenoを用いており、NewRenoの評価値は1523.26であった。
+したがって、本実験の環境下においては、もっとも高い評価値を示した個体はNewRenoよりも性能が高いと言える。
 
-なお、最も高い評価値を示した個体のソースコードを\appendixref{appendix:experiment-result}のListings \ref{lst:best_individual}に示す。適宜参照されたい。
+なお、もっとも高い評価値を示した個体のソースコードを\appendixref{appendix:experiment-result}のListings \ref{lst:best_individual}に示す。適宜参照されたい。
 
 Listings \ref{lst:best_individual}の個体のシミュレーション中のssthresh, cwndの推移を\figref{figure:best_individual_result}に示す。
 \begin{figure}[htbp]
@@ -576,14 +577,14 @@ Listings \ref{lst:best_individual}の個体のシミュレーション中のssth
 
 % TODO: ここに傾向を書く
 
-Listings \ref{lst:best_individual}のソースコードに関する詳細な議論は\chapref{chapter:discussion}で改めて行う。
+Listings \ref{lst:best_individual}のソースコードに関する詳細な議論は\chapref{chapter:discussion}であらためて行う。
 
 \newpage
 
 \chapter{考察}
 \label{chapter:discussion}
 この章では、\chapref{chapter:result}で示した結果について考察する。
-特に、Listings \ref{lst:best_individual}に示した評価値の良い個体について、著名な輻輳制御アルゴリズムと比較しながら議論を行う。また、\chapref{chapter:hypothesis}で立てた仮説の検証という観点から、本研究の貢献について述べる。
+特に、Listings \ref{lst:best_individual}に示した評価値の良い個体について、著名な輻輳制御アルゴリズムと比較しながら議論する。また、\chapref{chapter:hypothesis}で立てた仮説の検証という観点から、本研究の貢献について述べる。
 
 \section{評価値の良い個体に関する考察}
 議論の簡単のため、Listings \ref{lst:best_individual}に示した個体の疑似コードを\algorithmref{algorithm:highest-throughput-individual}に示す。
@@ -612,7 +613,7 @@ Listings \ref{lst:best_individual}のソースコードに関する詳細な議�
 
   \end{algorithmic}
 \end{algorithm}
-\algorithmref{algorithm:highest-throughput-individual}を観察すると、現在広く普及している輻輳制御アルゴリズムの一つであるCUBIC\cite{cubic}やTCP NewReno\cite{floyd2004newreno,henderson2012newreno}の要素を部分的に取り入れつつも、ユニークなアルゴリズムを実現していると考えられる
+\algorithmref{algorithm:highest-throughput-individual}を観察すると、現在広く普及している輻輳制御アルゴリズムの1つであるCUBIC\cite{cubic}やTCP NewReno\cite{floyd2004newreno,henderson2012newreno}の要素を部分的に取り入れつつも、ユニークなアルゴリズムを実現していると考えられる
 \footnote{これはあくまでも、\algorithmref{algorithm:highest-throughput-individual}が著名な輻輳制御アルゴリズムの要素を部分的には取り入れつつも、}。
 具体的には、Listings \ref{lst:best_individual}のL.5では、CUBICのように、cwndの増加を立方関数で表現している
 \footnote{厳密にはこの三乗根を取っているため、CUBICと同様の挙動を示すわけではない}。
@@ -633,10 +634,10 @@ wip
 これは、ソースコードを構文木によって表現し、交叉や変異を構文木に対する操作として定義しているためである。つまり、この操作を超えた探索を行うことはできず、ソースコード自体の構造を変化させるような探索は行えない。
 
 一方本研究で提案した、大規模言語モデルを用いた探索手法では、ソースコードを文字列として表現し、交叉や変異を文字列に対する操作として定義している。
-それゆえ、理論上は任意の文字列を生成することができるため、探索空間の制約はなくなったと考えられる。もちろん、それに伴って探索空間が広がっているが、本実験を通して、大規模言語モデルによって十分効率的に探索できると結論付けたい。
+それゆえ、理論上は任意の文字列を生成できるため、探索空間の制約はなくなったと考えられる。もちろん、それに伴って探索空間が広がっているが、本実験を通して、大規模言語モデルによって十分効率的に探索できると結論付けたい。
 
 第二に、探索された輻輳制御アルゴリズムの多様性について考える。
-多様性の評価については極めて難しく、本研究の中で、定量的な評価を行うことはできなかった。
+多様性の評価については難しく、本研究の中で、定量的に評価することはできなかった。
 （TODO: が、。。。）
 
 最後に、本研究の提案手法は任意のネットワーク環境下で最適な輻輳制御アルゴリズムの探索を行えるのか考える。
@@ -648,7 +649,7 @@ wip
   \item 評価関数が定義できること
 \end{enumerate}
 1, 2の制約は、評価のためにネットワークシミュレータを用いる必要があることに起因する。
-Loss-basedとDelay-basedでは、輻輳の検出方法が全く異なるため、この分類を超えて探索を行うことは難しいだろう
+Loss-basedとDelay-basedでは、輻輳の検出方法が全く異なるため、この分類を超えて探索することは難しいだろう
 \footnote{例えば、初期個体にこれらを混在させることはできるかもしれないが、シミュレーションシナリオや評価関数の設計、交叉や変異の実装や、探索効率を考えると難しいだろう。
 マルチエージェントシステムの観点から、例えばノード1をLoss-based、ノード2をDelay-basedとして、それぞれ探索を行うような試みは面白いかもしれないが、本稿ではこれ以上扱わない}。
 
@@ -684,7 +685,7 @@ Loss-basedとDelay-basedでは、輻輳の検出方法が全く異なるため�
 \appendix
 \chapter{実験結果の詳細}
 \label{appendix:experiment-result}
-実験の結果、最もスループットが高かった個体のソースコードをListings \ref{lst:best_individual}に示す。
+実験の結果、もっともスループットが高かった個体のソースコードをListings \ref{lst:best_individual}に示す。
 \begin{lstlisting}[caption=最もスループットが高かった個体のソースコード,label=lst:best_individual]
   from tcp_base import TcpEventBased
 
