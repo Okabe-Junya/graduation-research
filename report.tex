@@ -534,55 +534,79 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 \chapter{結果}
 
 \label{chapter:result}
-\chapref{chapter:experiment}で説明した実験を行った。その実験結果を示す。
+\chapref{chapter:experiment}で説明した実験を行った。
+この章では、その実験結果を示す。
 \figref{figure:generation_throughput}に、遺伝的アルゴリズムの世代ごとの評価値
 \footnote{評価値は、\secref{section:evaluation-method}で述べた評価関数$f$の値である。}
 の平均、最大値の推移を示す。
 \figref{figure:generation_throughput}で、横軸は世代数、縦軸はスループットを表す。
 ここでGAの交叉や変異によって実行不可能なアルゴリズムが生成された場合、その評価値は0となる。
 その影響を減らすために、評価値の上位50\%の個体のみを用いた平均も合わせて示す。
-\begin{figure}[htbp]
+\begin{figure}[thbp]
   \setlength\fboxsep{0pt}
   \centering
-  \includegraphics[width=1.0\linewidth]{fig/chap05/generation_throughput.png}
+  \includegraphics[width=0.9\linewidth]{fig/chap05/generation_throughput.png}
   \caption{世代ごとのスループットの平均、最大値の推移}
   \label{figure:generation_throughput}
 \end{figure}
 \figref{figure:generation_throughput}から、世代が進むにつれて、評価値の平均が緩やかな増加を示していることが読み取れる。
 その一方、個体の評価値の最大値については、世代を追っても増加傾向は見られない。
 
-\begin{figure}[htbp]
+実行不可能な個体を全て除いた場合の評価値の平均の推移を\figref{figure:generation_result_exclude_zero}に示す。
+\begin{figure}[thbp]
   \setlength\fboxsep{0pt}
   \centering
-  \includegraphics[width=1.0\linewidth]{fig/chap05/generation_throughput_exclude_zero.png}
+  \includegraphics[width=0.9\linewidth]{fig/chap05/generation_throughput_exclude_zero.png}
   \caption{実行不可能な個体を除いた世代ごとのスループットの平均の推移}
   \label{figure:generation_result_exclude_zero}
 \end{figure}
+\figref{figure:generation_result_exclude_zero}を見ても、有意な増加傾向はあまり見られなかった。
+これは、遺伝的操作である交叉や変異が、有効な個体を示していない可能性がある。
+また、\figref{figure:invalid_results}に示すように、実行不可能な個体が少なからず生成されていた。
+特に実行不可能な個体が多くされていた世代では、評価値の平均を取るための個体数が少なくなっており、平均値の推移にノイズが生じている可能性がある。
 
-\begin{figure}[htbp]
+特定の世代における評価値の分布をより詳しく観察するために、1, 10, 50, 100世代の評価値の箱ひげ図を\figref{figure:boxplot_throughput}に示す。
+\begin{figure}[thbp]
+  \setlength\fboxsep{0pt}
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig/chap05/boxplot_throughput.png}
+  \caption{1, 10, 50, 100世代のスループットの箱ひげ図}
+  \label{figure:boxplot_throughput}
+\end{figure}
+\figref{figure:boxplot_throughput}を観察すると、100世代目を除くと、第一四分位点、中央値、第三四分位点は増加傾向にあることが読み取れる。
+一方で、100世代目に注目すると、これらの値は減少しており、この間で探索がうまく行われなかった可能性がある。
+
+評価値以外の個体の評価指標として、cwnd, ssthreshの平均の推移を観察する。
+\figref{figure:generation_result}に、世代ごとのssthresh, cwndの平均の推移を示す。
+\begin{figure}[thbp]
   \setlength\fboxsep{0pt}
   \centering
   \includegraphics[width=1.0\linewidth]{fig/chap05/generation_result.png}
   \caption{世代ごとのssthresh, cwndの平均の推移}
   \label{figure:generation_result}
 \end{figure}
+\figref{figure:generation_result}を観察すると、世代を追っても、ssthresh, cwndの平均の推移に有意な変化は見られなかった。
+もっとも、これらの値は、評価値とは異なる指標であるため、探索を進めても変化が見られないことは、必ずしも探索がうまく行われていないことを意味しないことに注意されたい。
 
-\begin{figure}[htbp]
-  \setlength\fboxsep{0pt}
-  \centering
-  \includegraphics[width=1.0\linewidth]{fig/chap05/boxplot_throughput.png}
-  \caption{1, 10, 50, 100世代のスループットの箱ひげ図}
-  \label{figure:boxplot_throughput}
-\end{figure}
-
-\begin{figure}[htbp]
+評価値と同様、特定の世代におけるssthresh, cwndの分布をより詳しく観察するために、1, 10, 50, 100世代のssthresh, cwndの箱ひげ図を\figref{figure:boxplot}に示す。
+\begin{figure}[thbp]
   \setlength\fboxsep{0pt}
   \centering
   \includegraphics[width=1.0\linewidth]{fig/chap05/boxplot.png}
   \caption{1, 10, 50, 100世代のssthresh, cwndの箱ひげ図}
   \label{figure:boxplot}
 \end{figure}
+やはり箱ひげ図を観察しても、有意な変化は見られないことが読み取れる。
 
+\newpage
+
+個体の評価値やパラメーターと異なる観点から、特に大規模言語モデルによる交叉や変異が機能していたかを確認するために、世代ごとに実行不可能な個体がいくつ生成されたかを可視化する。
+ここで個体が実行不可能であるとは、以下のいずれかを満たすことを指す。
+\begin{enumerate}
+  \item 個体をネットワークシミュレータに組み込んで実行した際に、エラーが発生し、実行の終了コードが0以外となる
+  \item 個体をネットワークシミュレータに組み込んで実行した際に、所定の時間内にシミュレーションが終了しない\footnote{本実験では、シミュレーションの実行時間を120秒として、この時間を超えてシミュレーションが終了しない場合は、実行不可能な個体とした。制限時間内に終了しない個体の多くは、極めて多くのパケットを送信し続ける個体であった。実際のネットワーク環境では、このような挙動を示す個体は実用的ではないこと、単に実験時間が必要以上にかかることから、今回は一定の制限時間を設けた。}
+\end{enumerate}
+\figref{figure:invalid_results}に、世代ごとの実行不可能な個体数の推移を示す。
 \begin{figure}[htbp]
   \setlength\fboxsep{0pt}
   \centering
@@ -590,12 +614,16 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
   \caption{実行不可能な個体数の推移}
   \label{figure:invalid_results}
 \end{figure}
+\figref{figure:invalid_results}を観察すると、世代数と実行不可能な個体数には相関は見られないことが読み取れる。
+また、\figref{figure:invalid_results}から、平均して約4割ほどの個体は実行不可能であり、交叉や変異によって少なからず実行不可能な個体が生成されていたことが確認できる
+\footnote{実際、実行不可能な個体のうちの多くはタイムアウトによるものであった。特に、冪乗の計算や、乗算を繰り返すような個体は、多くのパケットを送信することになる。ns3-gymでは、実際に擬似的にパケットを送信するため、このような個体の実行には多くの時間がかかる。それゆえ、実行不可能な個体の多くは、タイムアウトによるものであった。}。
 
-
-また、すべての世代の中でもっとも高い評価値は、1668.45であった。
-本研究ではベンチマークとして、NewRenoを用いており、NewRenoの評価値は1523.26であった。
+章の最後に、特定の個体について詳しく観察する。
+すべての世代の中でもっとも高い評価値は、1668.45であった。
+ベンチマークとして用いたNewRenoの評価値は1523.26であった。
 したがって、本実験の環境下においては、もっとも高い評価値を示した個体はNewRenoよりも性能が高いと言える。
-
+もちろん、実験環境やネットワークトポロジーによって、この結果は異なる可能性がある。
+しかし本実験の環境は一般的なネットワーク環境を模したものであるため、この結果は一定の意味を持つと考えられる。
 なお、もっとも高い評価値を示した個体のソースコードを\appendixref{appendix:experiment-result}のListings \ref{lst:best_individual}に示す。適宜参照されたい。
 
 Listings \ref{lst:best_individual}の個体のシミュレーション中のssthresh, cwndの推移を\figref{figure:best_individual_result}に示す。
@@ -612,11 +640,8 @@ Listings \ref{lst:best_individual}の個体のシミュレーション中のssth
   \caption{TCP NewRenoのssthresh, cwndの推移}
   \label{figure:newreno_result}
 \end{figure}
-\figref{figure:best_individual_result}、\figref{figure:newreno_result}からいくつかの傾向が読み取れる。
 
-% TODO: ここに傾向を書く
-
-Listings \ref{lst:best_individual}のソースコードに関する詳細な議論は\chapref{chapter:discussion}であらためて行う。
+なお、Listings \ref{lst:best_individual}のソースコードに関する詳細な議論は\chapref{chapter:discussion}であらためて行う。
 
 \newpage
 
