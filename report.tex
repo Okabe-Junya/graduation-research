@@ -86,9 +86,8 @@
 
 優れた輻輳制御アルゴリズムを発見することは難しい。主な理由として、コンピュータネットワークの構造が時々刻々と変化することが挙げられる。つまり、特定のネットワーク構造化で最適なアルゴリズムを探索しても、時間経過につれ、良いパフォーマンスを発揮できなくなってしまう。
 
-そこで、大規模言語モデルと進化アルゴリズムを用いることで任意のネットワーク環境下で最適化を行う探索手法を提案する。既存の探索手法では、探索空間の制約が厳しかったものの、大規模言語モデルを用いることで、この問題を解決できた。
-
-TODO: 事実確認
+そこで、大規模言語モデルと進化アルゴリズムを用いることで任意のネットワーク環境下で最適化を行う探索手法を提案する。
+既存の探索手法では、探索空間の制約が厳しかったものの、大規模言語モデルを用いることで、この問題を解決できた。
 
 実際にネットワークシミュレータを用いた実験を行い、ベンチマークを超える輻輳制御アルゴリズムを発見できた。
 
@@ -134,7 +133,6 @@ TCP/IPネットワークでは、トランスポート層で輻輳制御が行�
 
 \subsection{輻輳制御アルゴリズムの概要}
 
-% TODO: 表現の見直し
 パケット交換型の通信網であるTCP/IPネットワークでは、トランスポート層で輻輳制御が行われている。
 そもそも輻輳とは、ネットワーク上のあるノード
 \footnote{多くの場合、これは中継ルータのいずれかである。}
@@ -159,34 +157,31 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
   \caption{Basic Congestion Control Algorithm}
   \label{algorithm:congestion_control_algorithm}
   \begin{algorithmic}[1]
-  \State $windowSize \gets 1$
-  \State $threshold \gets veryLargeNumber$
+  \State $cwnd \gets 1$
+  \State $ssthresh \gets veryLargeNumber$
   \While{true}
       \If{ACK is received}
-        \If{$windowSize < threshold$}
-            \State $windowSize \gets windowSize + 1$
+        \If{$cwnd < ssthresh$}
+            \State $cwnd \gets cwnd + 1$
         \Else
-            \State $windowSize \gets windowSize \times 2$
+            \State $cwnd \gets cwnd \times 2$
         \EndIf
       \EndIf
       \If{Congestion is detected}
-          \State $threshold \gets windowSize / 2$
-          \State $windowSize \gets 1$
+          \State $ssthresh \gets cwnd / 2$
+          \State $cwnd \gets 1$
       \EndIf
   \EndWhile
   \end{algorithmic}
 \end{algorithm}
 \algorithmref{algorithm:congestion_control_algorithm}では、以下の2つの変数と、ACKの受信の契機によってパケットの送信量を調整する。
 
-% TODO: windowSize ではなく、cwnd と書く
-% TODO: threshold ではなく、ssthresh と書く
-
 \begin{description}
-  \item[windowSize] windowSizeは、一度に送信可能なパケットの数を表す。輻輳制御アルゴリズムは、このwindowSizeを制御することで、パケット送信量を制御する。
-  \item[threshold] thresholdは、windowSizeを指数関数的に増加させる際の閾値を表す。thresholdを超えた場合には、windowSizeは加算によって増加させる。
+  \item[cwnd] cwndは、一度に送信可能なパケットの数を表す。輻輳制御アルゴリズムは、このcwndを制御することで、パケット送信量を制御する。
+  \item[ssthresh] ssthreshは、cwndを指数関数的に増加させる際の閾値を表す。ssthreshを超えた場合には、cwndは加算によって増加させる。
 \end{description}
-\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合にはwindowSizeを指数的あるいは線形に増加させることでパケット送信量を増加させる。
-一方で輻輳が発生した場合には、windowSizeを減少させることで、パケット送信量を減少させる。
+\algorithmref{algorithm:congestion_control_algorithm}では、輻輳が発生していない場合にはcwndを指数的あるいは線形に増加させることでパケット送信量を増加させる。
+一方で輻輳が発生した場合には、cwndを減少させることで、パケット送信量を減少させる。
 これが、輻輳制御アルゴリズムの基本的な動作である。
 
 \subsection{代表的な輻輳制御アルゴリズム}
@@ -210,7 +205,7 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 
 Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\cite{reno,tcp}が挙げられる。
 これは、TCP Tahoe\cite{congestion-avoidance}を改良したもので、Fast RetransmitとFast Recoveryという機構を追加したものである。
-これらはTCP Tahoeの課題であった、輻輳発生後のwindowSizeの回復速度を改善するために追加された。
+これらはTCP Tahoeの課題であった、輻輳発生後のcwndの回復速度を改善するために追加された。
 % TCP Renoの動作の概要を\figref{figure:reno-timeline}に示す。
 % \begin{figure}[htbp]
 %   \centering
@@ -220,13 +215,18 @@ Loss-basedの代表的な輻輳制御アルゴリズムとしては、TCP Reno\c
 % \end{figure}
 % TODO: \figref{figure:reno-timeline}の説明
 
-TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のwindowSizeの回復方法が改良されている。
-特に複数のパケットの損失時のwindowSizeの回復方法が改良されている。
-TCP RenoではFast Recover中に他のパケットが損失した場合、その損失は検出されず、ACKが受信されるまでwindowSizeが回復しない。
-一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにwindowSizeが回復する。
+TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012newreno}では、Fast Recoveryの実装やパケット損失時のcwndの回復方法が改良されている。
+特に複数のパケットの損失時のcwndの回復方法が改良されている。
+TCP RenoではFast Recover中に他のパケットが損失した場合、その損失は検出されず、ACKが受信されるまでcwndが回復しない。
+一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにcwndが回復する。
 
-% TODO: CUBICを加える。
-\cite{cubic}
+その他の代表的なLoss-basedの輻輳制御アルゴリズムとしては、TCP Cubic\cite{cubic}が挙げられる。
+Cubicは、ネットワークの帯域幅を効率的に利用するために、RenoやNewRenoを改良したものである。
+特に、広帯域のネットワーク
+\footnote{いわゆるロングファットパイプと呼ばれるネットワークである。}
+において、Reno/NewRenoが帯域幅を効率的に利用できない問題があった。
+Cubicでは、cwndの制御に三次関数を用いることで、これらの問題を解決している。
+後述のBBR\cite{bbr}とともに、現代広く用いられている輻輳制御アルゴリズムである。
 
 \subsubsection*{Delay-based 輻輳制御アルゴリズム}
 
@@ -234,9 +234,9 @@ TCP RenoではFast Recover中に他のパケットが損失した場合、その
 Delay-basedの輻輳制御アルゴリズムは、パケットロスを検知するのではなくRTTによってネットワーク上の輻輳の程度を推定し、パケット送信量を制御する。
 
 TCP Vegasは、RTTの変化量を用いて輻輳を検出する。
-RTTの変化による輻輳の検知は、一般的にはパケットロスによる検知よりも早いため、windowSizeの調整をより早く行うことができる
+RTTの変化による輻輳の検知は、一般的にはパケットロスによる検知よりも早いため、cwndの調整をより早く行うことができる
 \footnote{実際には、Delay-basedな輻輳制御アルゴリズムの輻輳の検知がLoss-basedよりも早いことで、パフォーマンス上の問題が発生することがある。
-例えばTCP Renoと、TCP Vegasが共存するネットワークにおいて、TCP VegasがRTTの変化によって素早くwindowSizeを調整する一方で、TCP Renoはパケットロスが発生するまで、多くのパケットを送信し続ける。
+例えばTCP Renoと、TCP Vegasが共存するネットワークにおいて、TCP VegasがRTTの変化によって素早くcwndを調整する一方で、TCP Renoはパケットロスが発生するまで、多くのパケットを送信し続ける。
 それゆえ、帯域幅の多くをTCP Renoが占有することになり、TCP Vegasのパフォーマンスが低下することがある。
 }
 。それゆえ、帯域幅を効率的に利用することができる。
@@ -477,7 +477,6 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 このとき、遺伝的アルゴリズムの交叉や変異は、大規模言語モデルを用いて実現する。
 評価関数については、\secref{section:evaluation-method}であらためて述べる。
 実験で実装する遺伝的アルゴリズムの擬似コードを\algorithmref{algorithm:genetic-algorithm}に示す。
-% TODO: \figref{figure:proposed_flow}の図を修正する
 \begin{algorithm}[htbp]
   \caption{Pseudocode of Genetic Algorithm}
   \label{algorithm:genetic-algorithm}
