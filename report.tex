@@ -805,7 +805,7 @@ Loss-basedとDelay-basedでは、輻輳の検出方法が全く異なるため�
           simTime_us = obs[2]
           # unique node ID
           nodeId = obs[3]
-          # current ssthresh
+          # current ssThreshold
           ssThresh = obs[4]
           # current contention window size
           cWnd = obs[5]
@@ -816,7 +816,7 @@ Loss-basedとDelay-basedでは、輻輳の検出方法が全く異なるため�
           # estimated bytes in flight
           bytesInFlight = obs[8]
 
-          # Mutate the congestion window and ssthresh calculation
+          # Mutate the congestion window and ssThreshold calculation
           if reward > 0 and segmentsAcked > 0:
               # Aim for cubic growth until ssThresh and linear afterwards
               new_cWnd = (
