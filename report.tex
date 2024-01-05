@@ -220,8 +220,13 @@ TCP Renoをさらに改良したTCP NewReno\cite{floyd2004newreno,henderson2012n
 TCP RenoではFast Recover中に他のパケットが損失した場合、その損失は検出されず、ACKが受信されるまでcwndが回復しない。
 一方で、TCP NewRenoではFast Recover中でも他のパケットに対する処理が行われるため、損失が検出されるとすぐにcwndが回復する。
 
-% TODO: CUBICを加える。
-\cite{cubic}
+その他の代表的なLoss-basedの輻輳制御アルゴリズムとしては、TCP Cubic\cite{cubic}が挙げられる。
+Cubicは、ネットワークの帯域幅を効率的に利用するために、RenoやNewRenoを改良したものである。
+特に、広帯域のネットワーク
+\footnote{いわゆるロングファットパイプと呼ばれるネットワークである。}
+において、Reno/NewRenoが帯域幅を効率的に利用できない問題があった。
+Cubicでは、cwndの制御に三次関数を用いることで、これらの問題を解決している。
+後述のBBR\cite{bbr}とともに、現代広く用いられている輻輳制御アルゴリズムである。
 
 \subsubsection*{Delay-based 輻輳制御アルゴリズム}
 
