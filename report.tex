@@ -470,6 +470,9 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
 \section{実験方法}
 \label{section:experiment-method}
 この節では実験の方法について述べる。
+
+\subsection{実験の流れ}
+
 方針は、\chapref{chapter:hypothesis}の\figref{figure:proposed_flow}で示したように、輻輳制御アルゴリズムを個体として、遺伝的アルゴリズムによって探索することである。
 このとき、遺伝的アルゴリズムの交叉や変異は、大規模言語モデルを用いて実現する。
 評価関数については、\secref{section:evaluation-method}であらためて述べる。
@@ -514,6 +517,15 @@ GPT-4はシンプルなJSON over HTTP(s) APIを提供している。
   \end{algorithmic}
 \end{algorithm}
 本実験では、\algorithmref{algorithm:genetic-algorithm}に示した疑似コードを実際にPythonで実装し、実験を行った。
+
+\subsection{初期個体の生成}
+\label{section:initialization}
+初期個体は、Lehmanら\cite{lehman2022evolution}が提案した手法に倣って、次のように生成した。
+\begin{enumerate}
+  \item 極めて原始的な輻輳制御アルゴリズムを用意する。今回は、すべて定数値を返すだけのアルゴリズムを用意した
+  \item 大規模言語モデルに、このアルゴリズムを変異させるように指示を出す
+  \item 2の操作を所定の回数繰り返し、これを初期個体とする
+\end{enumerate}
 
 \section{評価方法}
 \label{section:evaluation-method}
