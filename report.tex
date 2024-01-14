@@ -332,6 +332,13 @@ Lehmanら\cite{lehman2022evolution}は、大規模言語モデルを用いた変
 \label{subsection:evolutionary-algorithm}
 
 進化アルゴリズムや強化学習を用いて、輻輳制御アルゴリズムを探索する研究がいくつか行われている。
+そもそも輻輳制御は、一種のマルチエージェントシステムであるため、分散最適化の枠組みである進化アルゴリズムや強化学習を用いて、輻輳制御アルゴリズムを探索することは自然な発想である。
+
+分散最適化による輻輳制御アルゴリズムの探索手法として、
+Xingら\cite{xing2022optimization}は無線ネットワークの輻輳制御アルゴリズムの最適化を、分散最適化の観点から評価した。
+コンピュータネットワークに限らずに言えば、Jiら\cite{ji2021distributed}は、電力網の輻輳管理のために、分散最適化の枠組みである強化学習を用いた。
+
+進化アルゴリズムを用いて輻輳制御アルゴリズムを探索する研究として、
 Endoら\cite{endo-2022-toward}は、遺伝的プログラミング\cite{holland1992adaptation, gp, gp-foundation}
 の一種であるGE (Grammatical Evolution) \cite{grammatical-evolution}
 と品質多様性アルゴリズム\cite{quality-diversity}、共進化アルゴリズム\cite{poet, poet-gecco}を用いた輻輳制御アルゴリズムの探索を行った。
