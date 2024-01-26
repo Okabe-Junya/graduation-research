@@ -204,14 +204,7 @@ TCP/IPにおいて、トランスポート層では通信の信頼性を確保�
 これは輻輳制御アルゴリズムがどのように輻輳を検知するかによって分類されており、Loss-basedはパケットロスを検知することで輻輳を検知する。
 一方で、Delay-basedは、RTT: Round Trip Timeを用いることで輻輳を検知する。
 RTTとは、パケットが送信元から受信元に送信され、さらにそのACKが送信元に返ってくるまでの合計時間のことを指す。
-それぞれの代表的な輻輳制御アルゴリズムについて、\figref{figure:congestion_control_classification}に示す。
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\linewidth]{fig/chap02/empty.png}
-  \caption{[wip] 輻輳制御アルゴリズムの分類}
-  \label{figure:congestion_control_classification}
-\end{figure}
-\figref{figure:congestion_control_classification} では、Loss-based 輻輳制御アルゴリズムをhoge色で、Delay-based 輻輳制御アルゴリズムをfuga色で示している。
+Loss-basedとDelay-basedのそれぞれで代表的な輻輳制御アルゴリズムを概説する。
 
 \subsubsection*{Loss-based 輻輳制御アルゴリズム}
 
